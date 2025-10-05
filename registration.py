@@ -1,6 +1,9 @@
 # Registration
 
-import users_db 
+# PROBLEME :  add_user ne prend pas l'email ni la confirmation du mot de passe
+
+from users_db import UsersDatabase
+users_db = UsersDatabase()
 
 min=8
 
@@ -31,7 +34,7 @@ def registration():
     
     # Password strength check
     if not is_strong_password(password):
-        print("Password must be at least" + min +"characters long and include uppercase, lowercase, digit, and special character.")
+        print("Password must be at leas " + str(min) +" characters long and include uppercase, lowercase, digit, and special character.")
         return
     
     # Basic email format check
@@ -50,10 +53,13 @@ def registration():
         return
     
     # Unique email check
-    if not users_db.unique_user(email):
+    if not users_db.unique_user2(email):
         print("Email already exists. Please choose a different email.")
         return
 
     # If all checks pass, register the user
-        users_db.add_user(username, password)
-        print("Registration successful for {username} !")
+    users_db.add_user(username, password)
+    print("Registration successful for " + str(username) + " !")
+
+if __name__ == "__main__":
+    registration()
