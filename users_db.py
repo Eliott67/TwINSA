@@ -37,6 +37,9 @@ class UsersDatabase:
     
     def unique_user(self, username):
         return username not in self.users
+    
+    def unique_user2(self, email):
+        return email not in self.users
 
     def get_all_users(self):
         return list(self.users.keys())
