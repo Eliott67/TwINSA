@@ -2,7 +2,7 @@ class User:
     def __init__(self, username, email, password, name, age, country):
         self.username = username
         self.email = email
-        self.password = password
+        self.__password = password # Private attribute
         self.name = name
         self.age = age
         self.country = country
@@ -18,8 +18,15 @@ class User:
         self.followers.append(friend_username)
         print(f"{friend_username} is now following {self.username}.")
         
-    def follow(self, friend_username):
+    def add_following(self, friend_username):
         self.following.append(friend_username)
         print(f"{self.username} is now following {friend_username}.")
+    
+    def get_password(self):
+        return self.__password
 
-
+    def get_nb_followers(self):
+        return len(self.followers)
+                   
+    def get_nb_following(self):
+        return len(self.following)
