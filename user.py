@@ -1,4 +1,4 @@
-class user:
+class User:
     def __init__(self, username, email, password, name, age, country):
         self.username = username
         self.email = email
@@ -21,3 +21,5 @@ class user:
     def follow(self, friend_username):
         self.following.append(friend_username)
         print(f"{self.username} is now following {friend_username}.")
+
+
