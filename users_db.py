@@ -9,8 +9,16 @@ class UsersDatabase:
         self.db_file = db_file
         self.users_list = self.load_users()
         self.usernames_list = self.get_usernames()
+
+    def new_database(self):
+        if os.path.exists(self.db_file):
+            os.remove(self.db_file)
+        self.users_list = []
+        self.usernames_list = []
+        self.save_users()
     
     def show_users(self):
+        print("Current users in the database:")
         for user in self.users_list:
             print(f"Username: {user.username}, Email: {user.email}, Name: {user.name}, Age: {user.age}, Country: {user.country}")
 
@@ -19,21 +27,20 @@ class UsersDatabase:
         if os.path.exists(self.db_file):
             with open(self.db_file, 'r') as file:
                 json_file = json.load(file)
-            for user in json_file:
-                username = json_file[user]['username']
-                email = json_file[user]['email']
-                password = json_file[user]['password']
-                name = json_file[user]['name']
-                age = json_file[user]['age']
-                country = json_file[user]['country']
-                user = user.User(username, email, password, name, age, country)
-                users_list.append(user)
+            for username_item in json_file.keys():
+                username = json_file[username_item]['username']
+                email = json_file[username_item]['email']
+                password = json_file[username_item]['password']
+                name = json_file[username_item]['name']
+                age = json_file[username_item]['age']
+                country = json_file[username_item]['country']
+                user_new = user.User(username, email, password, name, age, country)
+                users_list.append(user_new)
             
         return users_list
     
     def get_usernames(self):
-        self.usernames_list = [user.username for user in self.users_list]
-        return self.usernames_list
+        return [user.username for user in self.users_list]
     
     def save_users(self):
         users_dict = {}
@@ -50,8 +57,8 @@ class UsersDatabase:
             json.dump(users_dict, file, indent=4)
 
     def add_user(self, user):
-        if user in self.users_list:
-            raise ValueError("User already exists")
+        if user.username in self.usernames_list:
+            raise ValueError("Username already exists")
         self.users_list.append(user)
         self.usernames_list.append(user.username)
         self.save_users()

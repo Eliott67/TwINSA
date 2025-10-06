@@ -6,6 +6,7 @@ class SecureUser(User):
     def __init__(self, username, email, password, name, age, country):
         super().__init__(username, email, password, name, age, country)
         self.reset_token = None  # pour mdp oublié
+        self.password = super().get_password()
 
     def verify_password(self, password):
         """Vérifie si le mot de passe correspond."""
