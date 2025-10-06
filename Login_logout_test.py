@@ -1,7 +1,7 @@
 # test_login_logout.py
 
 import unittest
-import login_logout
+import Login_logout_v2 as login_logout
 
 # 🔁 Création d'une fausse "base de données" d'utilisateurs pour les tests
 class FakeUsersDB:

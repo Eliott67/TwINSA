@@ -57,5 +57,23 @@ class TestUsersDatabase(unittest.TestCase):
         self.assertFalse(self.db.authenticate_user("alex", "pass123"))
 
 
+print("--Testing UsersDatabase class--")
+db_object = UsersDatabase()
+db_object.new_database()
+user1 = User("ines", "ines@mail.com", "pass123", "Inés", 20, "Andorra")
+user2 = User("alex", "alex@mail.com", "pass321", "Alex", 19, "Miami")
+user3 = User("cris", "cris@mail.com", "pass000", "Cristina", 48, "Encamp")
+db_object.add_user(user1)
+db_object.add_user(user2)
+db_object.add_user(user3)
+db_object.show_users()
+db_object.remove_user("alex")
+db_object.show_users()
+db_object.new_database()
+db_object.show_users()
+print("--End of testing UsersDatabase class--")
+
 if __name__ == '__main__':
     unittest.main()
+
+
