@@ -1,0 +1,10 @@
+{
+    "Perine": {
+        "username": "Perine",
+        "email": "test@example.com",
+        "password": "Pass123!",
+        "name": "perine",
+        "age": 20,
+        "country": "france"
+    }
+}
