@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-container">
+    <h1>Bienvenue sur TwINSA</h1>
+    {% if not session.get('username') %}
+        <a href="{{ url_for('login') }}" class="btn">Se connecter</a>
+        <a href="{{ url_for('register') }}" class="btn">Créer un compte</a>
+        <a href="{{ url_for('forgot_password') }}" class="btn">Mot de passe oublié</a>
+    {% else %}
+        <p>Vous êtes connecté !</p>
+    {% endif %}
+</div>
+{% endblock %}

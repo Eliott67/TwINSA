@@ -1,16 +1,16 @@
 import unittest
-from change_password import SecureUser 
+from backend.change_password import SecureUser 
 import string
 
 class TestSecureUser(unittest.TestCase):
 
     def setUp(self):
         self.user = SecureUser(
-            username="testuser",
-            email="test@example.com",
+            username="eliottoster",
+            email="eliottost@gmail.com",
             password="oldpass",
-            name="John Doe",
-            age=25,
+            name="Eliott Oster",
+            age=20,
             country="France"
         )
 
