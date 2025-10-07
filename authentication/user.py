@@ -30,3 +30,9 @@ class User:
                    
     def get_nb_following(self):
         return len(self.following)
+    
+    def add_post(self, post):
+        self.posts.append(post)
+        self.likes += post.likes
+        #finish...
+        
