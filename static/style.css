@@ -1,0 +1,83 @@
+/* --- Général --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+}
+
+header {
+    padding: 20px;
+    border-bottom: 1px solid #333;
+}
+
+.logo {
+    width: 60px;
+    margin-bottom: 10px;
+}
+
+/* --- Boutons --- */
+.btn {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #1da1f2;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #0d8ddb;
+}
+
+/* --- Containers --- */
+.home-container, .auth-container {
+    margin-top: 100px;
+}
+
+/* --- Formulaires --- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 0 auto;
+    gap: 10px;
+}
+
+.auth-form input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+.auth-form button {
+    padding: 10px;
+    background-color: #1da1f2;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-form button:hover {
+    background-color: #0d8ddb;
+}
+
+/* --- Flash messages --- */
+.flash-messages {
+    width: 300px;
+    margin: 10px auto;
+    text-align: center;
+}
+
+.flash.success {
+    color: #00ff00;
+}
+
+.flash.error {
+    color: #ff4d4d;
+}

@@ -1,6 +1,6 @@
 import random
 import string
-from user import User  
+from backend.user import User  
 
 class SecureUser(User):
     def __init__(self, username, email, password, name, age, country):

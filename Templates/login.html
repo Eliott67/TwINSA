@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <form method="POST" class="auth-form">
+        <h2>Connexion</h2>
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        <input type="password" name="password" placeholder="Mot de passe" required>
+        <button type="submit">Se connecter</button>
+        <a href="{{ url_for('forgot_password') }}">Mot de passe oublié ?</a>
+        <p>Pas de compte ? <a href="{{ url_for('register') }}">S'inscrire</a></p>
+    </form>
+</div>
+{% endblock %}
