@@ -2,16 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>TwinSa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TwINSA{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <header>
-        {% if session.get('username') %}
-            <p>Connecté en tant que {{ session['username'] }} | <a href="{{ url_for('logout') }}">Déconnexion</a></p>
-        {% endif %}
+    <!-- Barre de navigation / logo -->
+    <header class="navbar">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='logo_twinsa.png') }}" alt="TwINSA Logo" class="logo">
+            <h1 class="app-title">TwINSA</h1>
+        </div>
     </header>
 
+    <!-- Contenu principal -->
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -23,7 +28,9 @@
             {% endif %}
         {% endwith %}
 
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </main>
 </body>
 </html>
+
