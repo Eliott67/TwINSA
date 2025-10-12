@@ -1,43 +1,51 @@
-#Search Users
+# login_logout.py
 
-from ..users_db import UsersDatabase
-from ..user import User
+import users_db  # ce module sera remplacé par FakeUsersDB pendant les tests
 
-def go_to_search_bar():
-    print("\n--- Search Users ---")
-    history = []
+# Liste des utilisateurs connectés
+connected_users = []
 
-    # Fonction to search users
-
-    def search(query):
-        nonlocal history # Access the outer scope variable
-        history.insert(0, query) #add to the start of the list
-        history = history[:5]  # Keep only the last 5 searches
-        print(f"Searching for users matching: '{query}'")
-        print("Search History:", history)
-
-
-    # Fonction to clear search history
-
-    def clear_history():
-        nonlocal history
-        history.clear()
-        print("Search history cleared.")
-        print("Search History:", history)
-
+def login(identifier=None, password=None):
+    print("=== Log in ===")
     
-    # Simulation
-    print("User is searching for users")
-    search("Alice")
-    search("Bob")
-    search("Charlie")
-    search("David")
-    search("Eve")
-    search("Frank")  # This will push out "Alice" from history
-    print("\nUser decides to clear search history")
-    clear_history()
+    if identifier is None:
+        identifier = input("Enter your username or email: ")
+    if password is None:
+        password = input("Enter your password: ")
 
-if __name__ == "__main__":
-    go_to_search_bar()
+    if not identifier or not password:
+        print("All fields are required.")
+        return None
 
+    user = users_db.find_user(identifier)
+    if not user:
+        print("User not found. Please check your username/email.")
+        return None
 
+    if user["password"] != password:
+        print("Wrong password.")
+        return None
+
+    print(f"Login successful. Welcome back, {user['username']}!")
+
+    # Ajouter à la liste des connectés si pas déjà dedans
+    if user not in connected_users:
+        connected_users.append(user)
+
+    return user
+
+def logout(current_user):
+    if not current_user:
+        print("You are not logged in.")
+        return None
+
+    print(f"User {current_user['username']} has been logged out.")
+
+    # Retirer de la liste des connectés
+    if current_user in connected_users:
+        connected_users.remove(current_user)
+
+    return None
+
+def get_connected_users():
+    return connected_users
