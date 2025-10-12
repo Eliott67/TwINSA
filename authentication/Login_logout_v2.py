@@ -17,17 +17,17 @@ def login(identifier=None, password=None):
         return None
 
     # Vérifie si l'utilisateur existe
-    user = users_db.find_user(identifier)
+    user = users_db.get_user(identifier)
     if not user:
         print("User not found. Please check your username/email.")
         return None
 
     # Vérifie le mot de passe
-    if user["password"] != password:
+    if user.get_password() != password:
         print("Wrong password.")
         return None
 
-    print(f"Login successful. Welcome back, {user['username']}!")
+    print(f"Login successful. Welcome back, {user.username}!")
     return user  # retourne l'utilisateur connecté
 
 
@@ -36,5 +36,5 @@ def logout(current_user):
         print("You are not logged in.")
         return None
 
-    print(f"User {current_user['username']} has been logged out.")
+    print(f"User {current_user.username} has been logged out.")
     return None
