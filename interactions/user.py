@@ -9,11 +9,21 @@ class User:
         self.is_public = is_public
         self.followers = []
         self.following = []
-        self.posts = []
-        self.likes = 0
+        self.posts = []  # List of Post objects
+        self.likes = {}  # dict: post_id -> number of likes
+        self.total_likes = sum(self.likes.values())
 
     def display_info(self):
         print(f"Name: {self.name}, Email: {self.email}, Age: {self.age}, Country: {self.country}")
+
+    def display_posts(self):
+        if not self.posts:
+            print(f"{self.username} has no posts.")
+        else :
+            print(f"Posts by {self.username}:")
+            for post in self.posts:
+                post.display_post()
+                print("-" * 20)
 
     def add_follower(self, friend_username):
         self.followers.append(friend_username)
@@ -34,8 +44,10 @@ class User:
     
     def add_post(self, post):
         self.posts.append(post)
-        self.likes += post.likes
-        #finish...
+
+    def delete_post(self, post):
+        if post in self.posts:
+            self.posts.remove(post)
 
     def follows(self, other_user):
          # Vérifie si self suit other_user
