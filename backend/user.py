@@ -11,6 +11,8 @@ class User:
         self.following = []
         self.posts = []  # List of Post objects
         self.likes = {}  # dict: post_id -> number of likes
+        self.profile_picture = "/static/images/default_profile.png"
+        self.banner_url = "/static/images/default_banner.png"
         self.total_likes = sum(self.likes.values())
 
     def display_info(self):
@@ -26,13 +28,15 @@ class User:
                 print("-" * 20)
 
     def add_follower(self, friend_username):
-        self.followers.append(friend_username)
-        print(f"{friend_username} is now following {self.username}.")
+        if friend_username not in self.followers:
+            self.followers.append(friend_username)
+            print(f"{friend_username} is now following {self.username}.")
         
     def add_following(self, friend_username):
-        self.following.append(friend_username)
-        print(f"{self.username} is now following {friend_username}.")
-    
+        if friend_username not in self.following:
+            self.following.append(friend_username)
+            print(f"{self.username} is now following {friend_username}.")
+
     def get_password(self):
         return self.__password
 
@@ -53,4 +57,6 @@ class User:
          # Vérifie si self suit other_user
          return other_user.username in self.following
 
+    def __repr__(self):
+        return f"<User @{self.username} ({self.name})>"
         
