@@ -1,129 +1,136 @@
+import os
+import sys
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+
+# --- Add backend to path (for imports when running from root) ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.join(BASE_DIR, "backend")
+if BACKEND_DIR not in sys.path:
+    sys.path.append(BACKEND_DIR)
+
+# --- Imports from backend ---
 from backend.change_password import SecureUser
 from backend.users_db import UsersDatabase
+from backend.user import User
+from backend.registration import validate_registration
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key"  # nécessaire pour sessions et flash
+app.secret_key = "super_secret_key"
 
-# Charger la DB
-db = UsersDatabase("users_db.json")
+# Load user database
+DB_FILE = "users_db.json"
+db = UsersDatabase(DB_FILE)
 
 
-# --- Fonction utilitaire pour récupérer un SecureUser depuis le JSON ---
-def get_secure_user(username):
-    user_data = db.users.get(username)
-    if not user_data:
+# --- Utility: build a SecureUser from database ---
+def get_secure_user(username: str):
+    data = getattr(db, "users", {}).get(username)
+    if not data:
         return None
     return SecureUser(
         username=username,
-        email=user_data.get("email", ""),
-        password=user_data.get("password", ""),
-        name=user_data.get("name", ""),
-        age=user_data.get("age", None),
-        country=user_data.get("country", "")
+        email=data.get("email", ""),
+        password=data.get("password", ""),
+        name="",
+        age=None,
+        country=""
     )
 
 
-# --- Page d'accueil ---
+# --- HOME PAGE ---
 @app.route("/")
 def home():
-    username = session.get("username")
-    return render_template("home.html", username=username)
+    return render_template("home.html", username=session.get("username"))
 
 
-# --- Connexion ---
+# --- LOGIN ---
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
         user = get_secure_user(username)
         if user and user.verify_password(password):
             session["username"] = username
-            flash("Connexion réussie !", "success")
+            flash("Signed in successfully!", "success")
             return redirect(url_for("home"))
-        else:
-            flash("Identifiants incorrects", "error")
+
+        flash("Invalid credentials.", "error")
+        return redirect(url_for("login"))
+
     return render_template("login.html")
 
 
-# --- Déconnexion ---
+# --- LOGOUT ---
 @app.route("/logout")
 def logout():
     session.pop("username", None)
-    flash("Vous êtes déconnecté.", "success")
+    flash("You have been logged out.", "success")
     return redirect(url_for("home"))
 
 
-# --- Inscription ---
+# --- REGISTER ---
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
 
-        # Vérifie si username ou email existe déjà
-        if not db.unique_user(username):
-            flash("Nom d'utilisateur déjà pris", "error")
+        # Create temporary User object
+        new_user = User(username, email, password, name="", age=None, country="")
+
+        # Validate using backend function
+        valid, msg = validate_registration(new_user, confirm_password)
+
+        if not valid:
+            flash(msg, "error")
             return redirect(url_for("register"))
 
-        if any(u.get("email") == email for u in db.users.values()):
-            flash("Email déjà utilisé", "error")
-            return redirect(url_for("register"))
-
-        # Crée le nouvel utilisateur
-        new_user = SecureUser(username, email, password, name="", age=None, country="")
+        # Add user to JSON database
+        if not hasattr(db, "users") or db.users is None:
+            db.users = {}
         db.users[username] = {
-            "email": new_user.email,
-            "password": new_user.password,
-            "name": new_user.name,
-            "age": new_user.age,
-            "country": new_user.country
+            "email": email,
+            "password": password
         }
-        db.save_users()
-        flash("Compte créé avec succès !", "success")
+        if hasattr(db, "save_users"):
+            db.save_users()
+
+        flash("Account created successfully!", "success")
         return redirect(url_for("login"))
 
     return render_template("register.html")
 
 
-# --- Mot de passe oublié ---
+# --- FORGOT PASSWORD ---
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
-        email = request.form["email"]
+        email = request.form.get("email", "").strip()
 
-        # Chercher l'utilisateur par email
-        user = None
         username = None
-        for u, u_data in db.users.items():
-            if u_data.get("email") == email:
+        for u, data in getattr(db, "users", {}).items():
+            if data.get("email") == email:
                 username = u
-                user = u_data
                 break
 
-        if user:
-            # Crée un SecureUser temporaire pour générer le token
-            su = SecureUser(
-                username=username,
-                email=user["email"],
-                password=user["password"],
-                name=user.get("name", ""),
-                age=user.get("age", None),
-                country=user.get("country", "")
-            )
-            su.generate_reset_token()
-            # Affichage du token en console pour l’instant
-            print(f"[DEBUG] Token pour {email} : {su.reset_token}")
-            flash("✅ Code de réinitialisation envoyé à votre adresse e-mail ! (token en console pour test)", "success")
-        else:
-            flash("❌ Adresse e-mail inconnue", "error")
+        if not username:
+            flash("Email not found.", "error")
+            return redirect(url_for("forgot_password"))
+
+        su = get_secure_user(username)
+        su.generate_reset_token()
+        print(f"[DEBUG] Reset token for {email}: {su.reset_token}")
+        flash("Password reset code sent to your email (visible in console for testing).", "success")
+        return redirect(url_for("home"))
 
     return render_template("forgot_password.html")
 
 
-# --- Lancer l'application ---
+# --- RUN APP ---
 if __name__ == "__main__":
+    print(f"Using database: {os.path.abspath(DB_FILE)}")
     app.run(debug=True)
-

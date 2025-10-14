@@ -1,0 +1,37 @@
+{
+    "Eliott": {
+        "email": "eliottost@gmail.com",
+        "password": "twinsa123!",
+        "name": "",
+        "age": null,
+        "country": ""
+    },
+    "Leo ": {
+        "email": "parnotte@insa-toulouse.fr",
+        "password": "lep_la_trique",
+        "name": "",
+        "age": null,
+        "country": ""
+    },
+    "Salut": {
+        "email": "ioheotahtoz@gmail.com",
+        "password": "trois",
+        "name": "",
+        "age": null,
+        "country": ""
+    },
+    "zzz": {
+        "email": "zzz@gmail.com",
+        "password": "zzz",
+        "name": "",
+        "age": null,
+        "country": ""
+    },
+    "bb bb": {
+        "email": "bb@gmail.com",
+        "password": "bb",
+        "name": "",
+        "age": null,
+        "country": ""
+    }
+}
