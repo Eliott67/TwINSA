@@ -1,122 +1,245 @@
-/* --- Général --- */
+/* === GLOBAL === */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #000;  /* fond sombre façon X */
-    color: #fff;
-    text-align: center;
-    margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000; /* dark mode like X */
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* --- Barre de navigation --- */
+/* === NAVBAR (hidden on landing) === */
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff;
-    padding: 15px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: none;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* === LANDING PAGE === */
+.landing {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
 }
 
-.logo {
-    width: 55px;
-    height: auto;
+/* --- Left side: logo --- */
+.landing-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.app-title {
-    color: #000;
-    font-size: 1.8em;
-    font-weight: bold;
+.landing-logo {
+  width: 65%;
+  max-width: 480px; /* Bigger logo */
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(29, 161, 242, 0.5));
+  transition: transform 0.3s ease;
 }
 
-/* --- Flash messages --- */
+.landing-logo:hover {
+  transform: scale(1.05);
+}
+
+/* --- Right side: text + buttons --- */
+.landing-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center vertically */
+  align-items: flex-start;
+  padding: 0 100px;
+  text-align: left;
+  transform: translateY(-30px); /* Slight visual alignment adjustment */
+}
+
+.landing-right h2 {
+  font-size: 3.2em;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.landing-right p {
+  font-size: 1.4em;
+  color: #ccc;
+  margin-bottom: 40px;
+}
+
+/* === BUTTONS === */
+.btn,
+.btn-large,
+.btn-secondary {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 35px;
+  transition: 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* --- Main blue buttons --- */
+.btn-large {
+  background-color: #1da1f2;
+  color: #fff;
+  padding: 20px 45px; /* Larger buttons */
+  font-size: 1.2em;
+  margin: 14px 0;
+  min-width: 280px;
+}
+
+.btn-large:hover {
+  background-color: #0d8ddb;
+  transform: scale(1.03);
+}
+
+/* --- Secondary (Forgot password) --- */
+.btn-secondary {
+  background-color: #1da1f2;
+  color: #fff;
+  padding: 18px 40px;
+  font-size: 1.15em;
+  border: none;
+  margin: 14px 0;
+  min-width: 280px;
+}
+
+.btn-secondary:hover {
+  background-color: #0d8ddb;
+  color: #fff;
+  transform: scale(1.03);
+}
+
+/* --- Logout --- */
+.logout {
+  background-color: #ff4d4d !important;
+  color: white !important;
+  padding: 20px 45px;
+  font-size: 1.2em;
+}
+
+.logout:hover {
+  background-color: #cc0000 !important;
+  transform: scale(1.03);
+}
+
+/* === FLASH MESSAGES === */
 .flash-messages {
-    width: 300px;
-    margin: 20px auto;
-    text-align: center;
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  text-align: center;
 }
 
 .flash {
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
+  padding: 12px 25px;
+  border-radius: 25px;
+  margin: 10px 0;
+  font-weight: bold;
+  display: inline-block;
 }
 
 .flash.success {
-    background-color: #d1f7d6;
-    color: #065f0d;
+  background-color: #004d00;
+  color: #00ff88;
 }
 
 .flash.error {
-    background-color: #f8d7da;
-    color: #842029;
+  background-color: #330000;
+  color: #ff4d4d;
 }
 
-/* --- Boutons --- */
-.btn {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px 20px;
-    color: white;
-    background-color: #1da1f2; /* bleu Twitter */
-    border-radius: 20px;
-    text-decoration: none;
-    transition: 0.3s;
+/* === FORMS (login/register) === */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #000;
 }
 
-.btn:hover {
-    background-color: #0d8ddb;
-}
-
-/* --- Containers --- */
-.home-container, .auth-container {
-    margin-top: 100px;
-}
-
-/* --- Formulaires --- */
 .auth-form {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    margin: 0 auto;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 350px;
 }
 
 .auth-form input {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  background-color: #111;
+  color: #fff;
+  font-size: 1em;
+}
+
+.auth-form input::placeholder {
+  color: #888;
 }
 
 .auth-form button {
-    padding: 10px;
-    background-color: #1da1f2;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
+  background-color: #1da1f2;
+  border: none;
+  border-radius: 30px;
+  color: white;
+  font-weight: bold;
+  padding: 15px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .auth-form button:hover {
-    background-color: #0d8ddb;
+  background-color: #0d8ddb;
+  transform: scale(1.03);
 }
 
-/* --- Page d'accueil --- */
-.home-container {
-    display: flex;
+/* === RESPONSIVE DESIGN === */
+@media screen and (max-width: 900px) {
+  .landing {
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-}
+    text-align: center;
+  }
 
-.home-container h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-}
+  .landing-left,
+  .landing-right {
+    flex: none;
+    width: 100%;
+    padding: 30px;
+  }
 
+  .landing-logo {
+    width: 60%;
+    max-width: 280px;
+    margin-bottom: 40px;
+  }
+
+  .landing-right {
+    align-items: center;
+    transform: none;
+  }
+
+  .landing-right h2 {
+    font-size: 2.5em;
+  }
+
+  .landing-right p {
+    font-size: 1.1em;
+  }
+
+  .btn-large,
+  .btn-secondary,
+  .logout {
+    width: 80%;
+  }
+}

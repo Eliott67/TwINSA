@@ -1,12 +1,19 @@
-# Registration
+from backend.users_db import UsersDatabase
+from backend.user import User
 
+<<<<<<< HEAD
 from users_db import UsersDatabase
 from user import User 
 users_db = UsersDatabase()
+=======
+users_db = UsersDatabase("users_db.json")
+>>>>>>> be79723 (Application à jour avec logos et registration qui fonctionne)
 
 MIN_PASSWORD_LENGTH = 8
 
-def is_strong_password(password):
+
+def is_strong_password(password: str) -> bool:
+    """Check if a password meets strength requirements."""
     has_upper = any(c.isupper() for c in password)
     has_lower = any(c.islower() for c in password)
     has_digit = any(c.isdigit() for c in password)
@@ -15,6 +22,7 @@ def is_strong_password(password):
     return has_upper and has_lower and has_digit and has_special and length
 
 
+<<<<<<< HEAD
 def validate_registration(user : User, confirm_password : str):
 
     # Required fields check
@@ -77,3 +85,41 @@ if __name__ == "__main__":
     registration()
 
     
+=======
+def validate_registration(user: User, confirm_password: str):
+    """Validate user registration data."""
+
+    # Check required fields
+    if not user.username or not user.email or not user.get_password() or not confirm_password:
+        return False, "All fields are required."
+
+    # Password match
+    if user.get_password() != confirm_password:
+        return False, "Passwords do not match."
+
+    # Password strength
+    if not is_strong_password(user.get_password()):
+        return False, (
+            f"Password must be at least {MIN_PASSWORD_LENGTH} characters long, "
+            "and include uppercase, lowercase, number and special character."
+        )
+
+    # Email format
+    if "@" not in user.email or "." not in user.email:
+        return False, "Invalid email format."
+
+    # No spaces
+    if " " in user.username or " " in user.email:
+        return False, "Username and email cannot contain spaces."
+
+    # Unique username
+    if not users_db.unique_user(user.username):
+        return False, "Username already taken."
+
+    # Unique email
+    for u_data in users_db.users.values():
+        if u_data.get("email") == user.email:
+            return False, "Email already in use."
+
+    return True, "Registration successful."
+>>>>>>> be79723 (Application à jour avec logos et registration qui fonctionne)

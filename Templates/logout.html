@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Déconnexion{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Vous êtes maintenant déconnecté</h2>
+    <p>À bientôt sur <strong>TwINSA</strong> !</p>
+    <a href="{{ url_for('login') }}" class="btn">Se reconnecter</a>
+</div>
+{% endblock %}
