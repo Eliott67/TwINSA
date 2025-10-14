@@ -2,34 +2,38 @@
 
 import users_db  # ce module sera remplacé par FakeUsersDB pendant les tests
 
+# Liste des utilisateurs connectés
+connected_users = []
+
 def login(identifier=None, password=None):
     print("=== Log in ===")
     
-    # Si aucun argument n'est donné, on demande à l'utilisateur
     if identifier is None:
         identifier = input("Enter your username or email: ")
     if password is None:
         password = input("Enter your password: ")
 
-    # Vérification des champs
     if not identifier or not password:
         print("All fields are required.")
         return None
 
-    # Vérifie si l'utilisateur existe
-    user = users_db.get_user(identifier)
+    db = users_db.UsersDatabase()  # crée une instance
+    user = db.get_user(identifier)
     if not user:
         print("User not found. Please check your username/email.")
         return None
 
-    # Vérifie le mot de passe
     if user.get_password() != password:
         print("Wrong password.")
         return None
 
     print(f"Login successful. Welcome back, {user.username}!")
-    return user  # retourne l'utilisateur connecté
 
+    # Ajouter à la liste des connectés si pas déjà dedans
+    if user not in connected_users:
+        connected_users.append(user)
+
+    return user
 
 def logout(current_user):
     if not current_user:
@@ -37,4 +41,12 @@ def logout(current_user):
         return None
 
     print(f"User {current_user.username} has been logged out.")
+
+    # Retirer de la liste des connectés
+    if current_user in connected_users:
+        connected_users.remove(current_user)
+
     return None
+
+def get_connected_users():
+    return connected_users

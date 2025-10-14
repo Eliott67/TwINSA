@@ -1,5 +1,5 @@
 import registration
-import backend.users_db
+import users_db
 
 # Success 
 print("Test 1 - Success :")

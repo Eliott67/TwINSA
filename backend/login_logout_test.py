@@ -2,7 +2,7 @@
 
 import unittest
 #import Login_logout
-import Login_logout_v2 as Login_logout
+import login_logout as login_logout
 
 
 # 🔁 Création d'une fausse "base de données" d'utilisateurs pour les tests
