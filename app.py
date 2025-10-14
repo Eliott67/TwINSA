@@ -2,7 +2,7 @@ import os
 import sys
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
-# --- Add backend to path (for imports when running from root) ---
+# --- Make backend importable ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.join(BASE_DIR, "backend")
 if BACKEND_DIR not in sys.path:
@@ -17,23 +17,22 @@ from backend.registration import validate_registration
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
 
-# Load user database
-DB_FILE = "users_db.json"
-db = UsersDatabase(DB_FILE)
+# --- Load your database ---
+db = UsersDatabase("backend/users_database.json")
 
 
-# --- Utility: build a SecureUser from database ---
-def get_secure_user(username: str):
-    data = getattr(db, "users", {}).get(username)
-    if not data:
+# --- Utility: get SecureUser instance from username ---
+def get_secure_user(username):
+    user_obj = db.get_user(username)
+    if not user_obj:
         return None
     return SecureUser(
-        username=username,
-        email=data.get("email", ""),
-        password=data.get("password", ""),
-        name="",
-        age=None,
-        country=""
+        username=user_obj.username,
+        email=user_obj.email,
+        password=user_obj.get_password(),
+        name=user_obj.name,
+        age=user_obj.age,
+        country=user_obj.country
     )
 
 
@@ -50,14 +49,13 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        user = get_secure_user(username)
-        if user and user.verify_password(password):
+        if db.authenticate_user(username, password):
             session["username"] = username
             flash("Signed in successfully!", "success")
             return redirect(url_for("home"))
-
-        flash("Invalid credentials.", "error")
-        return redirect(url_for("login"))
+        else:
+            flash("Invalid username or password.", "error")
+            return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -79,28 +77,20 @@ def register():
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
-        # Create temporary User object
-        new_user = User(username, email, password, name="", age=None, country="")
+        new_user = User(username, email, password, name="", age=0, country="")
 
-        # Validate using backend function
         valid, msg = validate_registration(new_user, confirm_password)
-
         if not valid:
             flash(msg, "error")
             return redirect(url_for("register"))
 
-        # Add user to JSON database
-        if not hasattr(db, "users") or db.users is None:
-            db.users = {}
-        db.users[username] = {
-            "email": email,
-            "password": password
-        }
-        if hasattr(db, "save_users"):
-            db.save_users()
-
-        flash("Account created successfully!", "success")
-        return redirect(url_for("login"))
+        try:
+            db.add_user(new_user)
+            flash("Account created successfully!", "success")
+            return redirect(url_for("login"))
+        except ValueError:
+            flash("Username already exists.", "error")
+            return redirect(url_for("register"))
 
     return render_template("register.html")
 
@@ -111,17 +101,26 @@ def forgot_password():
     if request.method == "POST":
         email = request.form.get("email", "").strip()
 
-        username = None
-        for u, data in getattr(db, "users", {}).items():
-            if data.get("email") == email:
-                username = u
+        # Search for user by email
+        user_found = None
+        for user_obj in db.get_all_users():
+            if user_obj.email == email:
+                user_found = user_obj
                 break
 
-        if not username:
+        if not user_found:
             flash("Email not found.", "error")
             return redirect(url_for("forgot_password"))
 
-        su = get_secure_user(username)
+        su = SecureUser(
+            username=user_found.username,
+            email=user_found.email,
+            password=user_found.get_password(),
+            name=user_found.name,
+            age=user_found.age,
+            country=user_found.country
+        )
+
         su.generate_reset_token()
         print(f"[DEBUG] Reset token for {email}: {su.reset_token}")
         flash("Password reset code sent to your email (visible in console for testing).", "success")
@@ -130,7 +129,5 @@ def forgot_password():
     return render_template("forgot_password.html")
 
 
-# --- RUN APP ---
 if __name__ == "__main__":
-    print(f"Using database: {os.path.abspath(DB_FILE)}")
     app.run(debug=True)
