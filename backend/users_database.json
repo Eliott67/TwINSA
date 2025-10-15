@@ -22,5 +22,13 @@
         "name": "",
         "age": 0,
         "country": ""
+    },
+    "PA": {
+        "username": "PA",
+        "email": "pierrearmand@gmail.com",
+        "password": "Salut000!",
+        "name": "",
+        "age": 0,
+        "country": ""
     }
 }
