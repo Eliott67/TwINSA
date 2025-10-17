@@ -1,6 +1,6 @@
 from users_db import UsersDatabase
 from user import User
-from post import Post
+from posting import Post
 from posts_display import Feed  # ton fichier backend/posts_display.py
 
 # --- Initialisation de la base et des utilisateurs ---
