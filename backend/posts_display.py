@@ -1,7 +1,7 @@
 from datetime import datetime
 from user import User
 from users_db import UsersDatabase
-from post import Post
+from posting import Post
 
 class Feed:
     def __init__(self, user: User, database: UsersDatabase):
