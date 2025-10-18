@@ -34,7 +34,12 @@ class UsersDatabase:
                 name = json_file[username_item]['name']
                 age = json_file[username_item]['age']
                 country = json_file[username_item]['country']
-                user_new = user.User(username, email, password, name, age, country)
+                is_public = json_file[username_item].get('is_public', True)
+                followers = json_file[username_item].get('followers', [])
+                following = json_file[username_item].get('following', [])
+                user_new = user.User(username, email, password, name, age, country, is_public)
+                user_new.followers = followers
+                user_new.following = following
                 users_list.append(user_new)
             
         return users_list
@@ -51,7 +56,10 @@ class UsersDatabase:
                 'password': user.get_password(),
                 'name': user.name,
                 'age': user.age,
-                'country': user.country
+                'country': user.country,
+                'is_public': user.is_public,
+                'followers': user.followers,
+                'following': user.following
             }
         with open(self.db_file, 'w') as file:
             json.dump(users_dict, file, indent=4)

@@ -2,7 +2,7 @@
 
 from users_db import UsersDatabase
 from user import User
-from Login_logout_v2 import get_connected_users
+from login_logout import get_connected_users
 
 def go_to_search_bar():
     print("\n--- Search Users ---")
@@ -124,9 +124,23 @@ if __name__ == "__main__":
     )
     db.add_user(user_mat)
 
+# Création de l'utilisateur "bob"
+    user_bob = User(
+        username="bob",
+        email="bob@mail.com",
+        password="5678",  # doit correspondre au mot de passe du login
+        name="Bob",
+        age=28,
+        country="USA",
+        is_public=False
+    )
+    db.add_user(user_bob)
+    user_mat.add_following(user_bob.username)  # mat suit bob
+    user_bob.add_follower(user_mat.username)   # bob a mat comme follower
+    db.save_users()
+
     # Optionnel : ajouter d'autres utilisateurs à rechercher
     db.add_user(User("alice", "alice@mail.com", "1234", "Alice", 25, "Canada",is_public=False))
-    db.add_user(User("bob", "bob@mail.com", "5678", "Bob", 28, "USA",is_public=False))
     db.add_user(User("matheo", "matheo@mail.com", "0000", "Matheo", 22, "France",is_public=True))
 
     print("Base de test initialisée avec les utilisateurs : mat, alice, bob, matheo")
@@ -136,6 +150,6 @@ if __name__ == "__main__":
     go_to_search_bar()
 
     print("\n=== TEST AVEC UN UTILISATEUR CONNECTÉ ===")
-    from Login_logout_v2 import login
+    from login_logout import login
     login("mat", "Pass123!")  # devrait fonctionner maintenant
     go_to_search_bar()
