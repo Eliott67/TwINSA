@@ -93,8 +93,69 @@ def go_to_search_bar():
                 print(f"- Age: {user.age}")
                 print(f"- Country: {user.country}")
                 print(f"- Account Type: {'Public' if user.is_public else 'Private'}")
+                # ➕ Ajout : sous-menu pour voir followers/following
+                while True:
+                    print("\nView:")
+                    print("1. Followers")
+                    print("2. Following")
+                    if current_user.follows(user):
+                        print("3. Unfollow")
+                    else:
+                        print("3. Follow")
+                    if current_user.blocks(user):
+                        print("4. Unblock")
+                    else:
+                        print("4. Block")
+                    print("5. View common friends")
+                    print("6. Back to Search Menu")
+                    sub_choice = input("Choose an option: ")
+
+                    if sub_choice == "1":
+                        user.display_followers()
+                    elif sub_choice == "2":
+                        user.display_following()
+                    elif sub_choice == "3":
+                        if current_user.follows(user):
+                            current_user.unfollow(user)
+                        else:
+                            current_user.follow(user)
+                    elif sub_choice == "4":
+                        if current_user.blocks(user):
+                            current_user.unblock(user)
+                        else:
+                            current_user.block(user)
+                    elif sub_choice == "5":
+                        current_user.get_common_friends(user)
+                    elif sub_choice == "6":
+                        break
+                    else:
+                        print("Invalid choice.")
+
+            
             else:
                 print("This account is private. Follow the user to see more information.")
+                while True:
+                    print("\nActions:")
+                    print("1. Send Follow Request")
+                    if current_user.blocks(user):
+                        print("2. Unblock")
+                    else:
+                        print("2. Block")
+                    print("3. Back to Search Menu")
+                    sub_choice = input("Choose an option: ")
+
+                    if sub_choice == "1":
+                        current_user.follow(user)  # Cela va envoyer une demande
+                    elif sub_choice == "2":
+                        if current_user.blocks(user):
+                            current_user.unblock(user)
+                        else:
+                            current_user.block(user)
+                    elif sub_choice == "3":
+                        break
+                    else:
+                        print("Invalid choice.")
+
 
         elif choice == "5":
             print("Exiting search.")

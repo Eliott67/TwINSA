@@ -1,34 +1,50 @@
 {
-    "Perine": {
-        "username": "Perine",
-        "email": "test@example.com",
+    "mat": {
+        "username": "mat",
+        "email": "mat@example.com",
         "password": "Pass123!",
-        "name": "perine",
-        "age": 20,
-        "country": "france"
+        "name": "Matthieu",
+        "age": 30,
+        "country": "France",
+        "is_public": true,
+        "followers": [],
+        "following": [
+            "bob"
+        ]
     },
-    "Eliott": {
-        "username": "Eliott",
-        "email": "eliottost@gmail.com",
-        "password": "Twinsa123!",
-        "name": "",
-        "age": 0,
-        "country": ""
+    "bob": {
+        "username": "bob",
+        "email": "bob@mail.com",
+        "password": "5678",
+        "name": "Bob",
+        "age": 28,
+        "country": "USA",
+        "is_public": false,
+        "followers": [
+            "mat"
+        ],
+        "following": []
     },
-    "Jules": {
-        "username": "Jules",
-        "email": "jules@gmail.com",
-        "password": "123JULEs!",
-        "name": "",
-        "age": 0,
-        "country": ""
+    "alice": {
+        "username": "alice",
+        "email": "alice@mail.com",
+        "password": "1234",
+        "name": "Alice",
+        "age": 25,
+        "country": "Canada",
+        "is_public": false,
+        "followers": [],
+        "following": []
     },
-    "PA": {
-        "username": "PA",
-        "email": "pierrearmand@gmail.com",
-        "password": "Salut000!",
-        "name": "",
-        "age": 0,
-        "country": ""
+    "matheo": {
+        "username": "matheo",
+        "email": "matheo@mail.com",
+        "password": "0000",
+        "name": "Matheo",
+        "age": 22,
+        "country": "France",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }
