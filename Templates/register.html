@@ -1,14 +1,21 @@
 {% extends "base.html" %}
+{% block title %}Sign up - TwINSA{% endblock %}
 
 {% block content %}
 <div class="auth-container">
-    <form method="POST" class="auth-form">
-        <h2>Créer un compte</h2>
-        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-        <input type="email" name="email" placeholder="Adresse e-mail" required>
-        <input type="password" name="password" placeholder="Mot de passe" required>
-        <button type="submit">S'inscrire</button>
-        <p>Déjà inscrit ? <a href="{{ url_for('login') }}">Se connecter</a></p>
-    </form>
+  <form method="POST" class="auth-form">
+    <h2>Create your account</h2>
+
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="email" name="email" placeholder="Email address" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="confirm_password" placeholder="Confirm password" required>
+
+    <button type="submit">Sign up</button>
+
+    <p class="form-text">
+      Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </p>
+  </form>
 </div>
 {% endblock %}

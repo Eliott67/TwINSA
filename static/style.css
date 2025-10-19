@@ -1,122 +1,177 @@
-/* --- Général --- */
+/* === GLOBAL === */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #000;  /* fond sombre façon X */
-    color: #fff;
-    text-align: center;
-    margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000; /* Dark mode */
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* --- Barre de navigation --- */
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff;
-    padding: 15px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+.navbar { display: none; }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo {
-    width: 55px;
-    height: auto;
-}
-
-.app-title {
-    color: #000;
-    font-size: 1.8em;
-    font-weight: bold;
-}
-
-/* --- Flash messages --- */
+/* === FLASH MESSAGES === */
 .flash-messages {
-    width: 300px;
-    margin: 20px auto;
-    text-align: center;
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  text-align: center;
 }
-
 .flash {
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
+  padding: 12px 25px;
+  border-radius: 25px;
+  margin: 10px 0;
+  font-weight: bold;
+  display: inline-block;
 }
+.flash.success { background-color: #004d00; color: #00ff88; }
+.flash.error   { background-color: #330000; color: #ff4d4d; }
 
-.flash.success {
-    background-color: #d1f7d6;
-    color: #065f0d;
+/* === LANDING (si utilisée) === */
+.landing {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
 }
-
-.flash.error {
-    background-color: #f8d7da;
-    color: #842029;
+.landing-left, .landing-right {
+  flex: 1; display: flex; justify-content: center; align-items: center;
 }
+.landing-right { flex-direction: column; align-items: flex-start; padding: 0 100px; text-align: left; transform: translateY(-30px); }
+.landing-logo { width: 65%; max-width: 480px; height: auto; filter: drop-shadow(0 0 40px rgba(29,161,242,0.5)); transition: transform .3s; }
+.landing-logo:hover { transform: scale(1.05); }
+.landing-right h2 { font-size: 3.2em; font-weight: bold; margin-bottom: 15px; }
+.landing-right p { font-size: 1.4em; color: #ccc; margin-bottom: 40px; }
 
-/* --- Boutons --- */
-.btn {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px 20px;
-    color: white;
-    background-color: #1da1f2; /* bleu Twitter */
-    border-radius: 20px;
-    text-decoration: none;
-    transition: 0.3s;
+/* === BUTTONS === */
+.btn, .btn-large, .btn-secondary {
+  display: inline-block; text-decoration: none; font-weight: bold;
+  border-radius: 35px; transition: .3s ease; cursor: pointer; text-align: center;
 }
-
-.btn:hover {
-    background-color: #0d8ddb;
+.btn-large {
+  background-color: #1da1f2; color: #fff; padding: 20px 45px; font-size: 1.2em; margin: 14px 0; min-width: 280px;
 }
-
-/* --- Containers --- */
-.home-container, .auth-container {
-    margin-top: 100px;
+.btn-large:hover { background-color: #0d8ddb; transform: scale(1.03); }
+.btn-secondary {
+  background-color: #1da1f2; color: #fff; padding: 18px 40px; font-size: 1.15em; border: none; margin: 14px 0; min-width: 280px;
 }
+.btn-secondary:hover { background-color: #0d8ddb; transform: scale(1.03); }
+.logout { background-color: #ff4d4d !important; color:#fff !important; padding: 20px 45px; font-size: 1.2em; }
+.logout:hover { background-color: #cc0000 !important; transform: scale(1.03); }
 
-/* --- Formulaires --- */
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    margin: 0 auto;
-    gap: 10px;
+/* === AUTH FORMS === */
+.auth-container {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100vh; background-color: #000;
 }
-
+.auth-form { display: flex; flex-direction: column; gap: 18px; width: 350px; }
 .auth-form input {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
+  padding: 15px; border-radius: 10px; border: 1px solid #444; background-color: #111;
+  color: #fff; font-size: 1em;
 }
-
+.auth-form input::placeholder { color: #888; }
 .auth-form button {
-    padding: 10px;
-    background-color: #1da1f2;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
+  background-color: #1da1f2; border: none; border-radius: 30px; color:#fff; font-weight: bold;
+  padding: 15px; font-size: 1.1em; cursor: pointer; transition: .3s;
+}
+.auth-form button:hover { background-color: #0d8ddb; transform: scale(1.03); }
+
+/* === FEED HEADER (TOP BAR) === */
+.feed-header-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin: 20px auto 40px; max-width: 800px; padding: 0 20px;
+}
+.feed-header-top h2 { font-size: 1.8em; color: #fff; }
+.logout-btn {
+  background-color: #ff4d4d; color:#fff; padding: 12px 24px; border-radius: 25px;
+  font-weight: bold; text-decoration: none; transition: .3s;
+}
+.logout-btn:hover { background-color: #cc0000; transform: scale(1.05); }
+
+/* === FEED === */
+.feed-container { max-width: 600px; margin: 20px auto 80px; text-align: left; }
+.feed-container h2 { text-align: center; margin-bottom: 20px; }
+
+/* === TWEET FORM === */
+.tweet-form { display: flex; flex-direction: column; margin-bottom: 20px; }
+.tweet-form textarea {
+  background-color: #111; color:#fff; border: 1px solid #333; border-radius: 10px;
+  padding: 12px; font-size: 1em; resize: none; height: 100px; margin-bottom: 10px;
+}
+.tweet-footer { display: flex; justify-content: space-between; align-items: center; }
+#charCount { font-size: .9em; color: #aaa; }
+.tweet-form button {
+  align-self:flex-end; background-color:#1da1f2; border:none; border-radius:20px; color:#fff;
+  font-weight:bold; padding:10px 25px; cursor:pointer; transition:.3s;
+}
+.tweet-form button:hover { background-color:#0d8ddb; }
+
+/* === TWEETS === */
+.tweets .tweet {
+  background-color: #111; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #333;
+}
+.tweets .tweet strong { color:#1da1f2; }
+.tweets .tweet p { margin: 5px 0 0 0; color:#eee; }
+.tweets .tweet small { color:#888; }
+
+/* === ACTIONS (LIKE / COMMENT / DELETE) === */
+.tweet-actions {
+  display: flex; align-items: center; gap: 20px; margin-top: 10px;
+}
+.like-btn, .comment-btn, .delete-comment {
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer; transition: all .25s ease; font-weight: bold;
+}
+/* Like */
+.like-btn { color:#bbb; font-size: 1.1em; }
+.like-btn:hover { color:#ff4d4d; transform: scale(1.1); }
+/* Comment (submit button icon) */
+.comment-btn {
+  background: transparent; border: none; color:#1da1f2; font-size: 1.3em; transition: all .2s ease; cursor: pointer;
+}
+.comment-btn:hover { transform: scale(1.15); color:#0d8ddb; }
+/* Delete comment */
+.delete-comment { color:#555; font-size: 1.1em; margin-left: 8px; }
+.delete-comment:hover { color:#ff4d4d; transform: scale(1.15); }
+
+/* === COMMENTS LIST & FORM === */
+.tweet-comments { margin-top: 12px; padding-left: 10px; border-left: 2px solid #1da1f2; }
+.comment {
+  background-color: #0d0d0d; border-radius: 14px; padding: 10px 14px; margin: 8px 0;
+  position: relative; transition: background .2s ease; box-shadow: 0 0 8px rgba(29,161,242,0.1);
+}
+.comment:hover { background-color:#141414; }
+.comment-header { display:flex; justify-content: space-between; align-items:center; }
+.comment strong { color:#1da1f2; font-weight: 600; }
+.comment p { margin: 4px 0; color:#eaeaea; }
+.comment small { color:#666; font-size:.8em; }
+
+/* Comment form input (dark, rounded) */
+.comment-form {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px; width: 100%;
+}
+.comment-form input {
+  flex: 1; padding: 10px 14px; border-radius: 25px; border: 1px solid #222;
+  background-color: #111; color:#fff; font-size:.95em; outline:none; transition: all .25s ease;
+}
+.comment-form input::placeholder { color:#666; opacity:.9; }
+.comment-form input:focus {
+  border: 1px solid #1da1f2; background-color:#0a0a0a; box-shadow: 0 0 6px rgba(29,161,242,.3);
 }
 
-.auth-form button:hover {
-    background-color: #0d8ddb;
+/* === RESPONSIVE === */
+@media screen and (max-width: 900px) {
+  .landing { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  .landing-left, .landing-right { width: 100%; padding: 30px; }
+  .landing-logo { width:60%; max-width: 280px; margin-bottom: 40px; }
+  .landing-right { align-items: center; transform: none; }
+  .landing-right h2 { font-size: 2.5em; }
+  .landing-right p { font-size: 1.1em; }
+  .btn-large, .btn-secondary, .logout { width: 80%; }
 }
-
-/* --- Page d'accueil --- */
-.home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.home-container h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-}
-

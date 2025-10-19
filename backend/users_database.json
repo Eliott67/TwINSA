@@ -6,5 +6,29 @@
         "name": "perine",
         "age": 20,
         "country": "france"
+    },
+    "Eliott": {
+        "username": "Eliott",
+        "email": "eliottost@gmail.com",
+        "password": "Twinsa123!",
+        "name": "",
+        "age": 0,
+        "country": ""
+    },
+    "Jules": {
+        "username": "Jules",
+        "email": "jules@gmail.com",
+        "password": "123JULEs!",
+        "name": "",
+        "age": 0,
+        "country": ""
+    },
+    "PA": {
+        "username": "PA",
+        "email": "pierrearmand@gmail.com",
+        "password": "Salut000!",
+        "name": "",
+        "age": 0,
+        "country": ""
     }
 }

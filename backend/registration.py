@@ -1,12 +1,15 @@
-# Registration
+from backend.users_db import UsersDatabase
+from backend.user import User
 
-from users_db import UsersDatabase
-from user import User 
+from backend.users_db import UsersDatabase
+from backend.user import User 
 users_db = UsersDatabase()
 
 MIN_PASSWORD_LENGTH = 8
 
-def is_strong_password(password):
+
+def is_strong_password(password: str) -> bool:
+    """Check if a password meets strength requirements."""
     has_upper = any(c.isupper() for c in password)
     has_lower = any(c.islower() for c in password)
     has_digit = any(c.isdigit() for c in password)

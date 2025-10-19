@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Feed - TwINSA{% endblock %}
+
+{% block content %}
+<!-- Barre du haut avec bouton log out -->
+<div class="feed-header-top">
+  <h2>Welcome, {{ username }} 👋</h2>
+  <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
+</div>
+
+<div class="feed-container">
+  <!-- Formulaire pour poster -->
+  <form method="POST" class="tweet-form" id="tweetForm">
+    <textarea id="tweetBox" name="tweet" maxlength="180" placeholder="What's happening?" required></textarea>
+    <div class="tweet-footer">
+      <span id="charCount">0 / 180</span>
+      <button type="submit">Post</button>
+    </div>
+  </form>
+
+  <hr>
+
+  <!-- Liste des posts -->
+  <div class="tweets">
+    {% if tweets %}
+      {% for tweet in tweets %}
+        {% set _ = tweet.update({'index': loop.index0}) %}
+        <div class="tweet">
+          <strong>@{{ tweet.poster_username }}</strong>
+          <p>{{ tweet.content }}</p>
+          <small>{{ tweet.date }}</small>
+
+          <!-- Zone de likes -->
+          <div class="tweet-actions">
+            <a href="{{ url_for('like', post_index=loop.index0) }}" class="like-btn">
+              ❤️ {{ tweet.likes|length }}
+            </a>
+          </div>
+
+          <!-- Zone de commentaires -->
+          <div class="tweet-comments">
+            {% if tweet.comments %}
+              {% for c in tweet.comments %}
+                <div class="comment">
+                  <div class="comment-header">
+                    <strong>@{{ c.username }}</strong>
+                    {% if c.username == username %}
+                      <a href="{{ url_for('delete_comment', post_index=tweet.index, comment_index=loop.index0) }}" class="delete-comment">🗑️</a>
+                    {% endif %}
+                  </div>
+                  <p>{{ c.comment }}</p>
+                  <small>{{ c.date }}</small>
+                </div>
+              {% endfor %}
+            {% endif %}
+            <form action="{{ url_for('comment', post_index=loop.index0) }}" method="POST" class="comment-form">
+              <input type="text" name="comment" placeholder="Add a comment..." maxlength="120">
+              <button type="submit" class="comment-btn">💬</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No posts yet. Be the first to post!</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Script compteur -->
+<script>
+const tweetBox = document.getElementById('tweetBox');
+const charCount = document.getElementById('charCount');
+
+tweetBox.addEventListener('input', () => {
+  const length = tweetBox.value.length;
+  charCount.textContent = `${length} / 180`;
+  charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
+});
+</script>
+{% endblock %}

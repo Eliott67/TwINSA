@@ -1,129 +1,252 @@
+import os
+import sys
+import json
+import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from backend.change_password import SecureUser
+
+# --- Make backend importable ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.join(BASE_DIR, "backend")
+if BACKEND_DIR not in sys.path:
+    sys.path.append(BACKEND_DIR)
+
+# --- Imports from backend ---
 from backend.users_db import UsersDatabase
+from backend.user import User
+from backend.change_password import SecureUser
+from backend.registration import validate_registration
+from backend.posting import Post
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key"  # nécessaire pour sessions et flash
+app.secret_key = "super_secret_key"
 
-# Charger la DB
-db = UsersDatabase("users_db.json")
+# --- Load database ---
+db = UsersDatabase("backend/users_database.json")
+
+# --- Posts file ---
+POSTS_FILE = "posts.json"
 
 
-# --- Fonction utilitaire pour récupérer un SecureUser depuis le JSON ---
+# === Helper functions ===
+def load_posts():
+    if os.path.exists(POSTS_FILE):
+        with open(POSTS_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+
+def save_posts(posts):
+    with open(POSTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(posts, f, indent=4, default=str)
+
+
 def get_secure_user(username):
-    user_data = db.users.get(username)
-    if not user_data:
+    """Convert backend user object into a SecureUser"""
+    user_obj = db.get_user(username)
+    if not user_obj:
         return None
     return SecureUser(
-        username=username,
-        email=user_data.get("email", ""),
-        password=user_data.get("password", ""),
-        name=user_data.get("name", ""),
-        age=user_data.get("age", None),
-        country=user_data.get("country", "")
+        username=user_obj.username,
+        email=user_obj.email,
+        password=user_obj.get_password(),
+        name=user_obj.name,
+        age=user_obj.age,
+        country=user_obj.country
     )
 
 
-# --- Page d'accueil ---
+# === ROUTES ===
+
 @app.route("/")
 def home():
-    username = session.get("username")
-    return render_template("home.html", username=username)
+    return render_template("home.html", username=session.get("username"))
 
 
-# --- Connexion ---
+# --- LOGIN ---
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        user = get_secure_user(username)
-        if user and user.verify_password(password):
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        if db.authenticate_user(username, password):
             session["username"] = username
-            flash("Connexion réussie !", "success")
-            return redirect(url_for("home"))
+            flash("Signed in successfully!", "success")
+            return redirect(url_for("feed"))
         else:
-            flash("Identifiants incorrects", "error")
+            flash("Invalid username or password.", "error")
+            return redirect(url_for("login"))
+
     return render_template("login.html")
 
 
-# --- Déconnexion ---
+# --- LOGOUT ---
 @app.route("/logout")
 def logout():
     session.pop("username", None)
-    flash("Vous êtes déconnecté.", "success")
+    flash("You have been logged out.", "success")
     return redirect(url_for("home"))
 
 
-# --- Inscription ---
+# --- REGISTER ---
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
 
-        # Vérifie si username ou email existe déjà
-        if not db.unique_user(username):
-            flash("Nom d'utilisateur déjà pris", "error")
+        new_user = User(username, email, password, name="", age=0, country="")
+
+        valid, msg = validate_registration(new_user, confirm_password)
+        if not valid:
+            flash(msg, "error")
             return redirect(url_for("register"))
 
-        if any(u.get("email") == email for u in db.users.values()):
-            flash("Email déjà utilisé", "error")
+        try:
+            db.add_user(new_user)
+            flash("Account created successfully!", "success")
+            return redirect(url_for("login"))
+        except ValueError:
+            flash("Username already exists.", "error")
             return redirect(url_for("register"))
-
-        # Crée le nouvel utilisateur
-        new_user = SecureUser(username, email, password, name="", age=None, country="")
-        db.users[username] = {
-            "email": new_user.email,
-            "password": new_user.password,
-            "name": new_user.name,
-            "age": new_user.age,
-            "country": new_user.country
-        }
-        db.save_users()
-        flash("Compte créé avec succès !", "success")
-        return redirect(url_for("login"))
 
     return render_template("register.html")
 
 
-# --- Mot de passe oublié ---
+# --- FORGOT PASSWORD ---
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
-        email = request.form["email"]
+        email = request.form.get("email", "").strip()
 
-        # Chercher l'utilisateur par email
-        user = None
-        username = None
-        for u, u_data in db.users.items():
-            if u_data.get("email") == email:
-                username = u
-                user = u_data
+        user_found = None
+        for user_obj in db.get_all_users():
+            if user_obj.email == email:
+                user_found = user_obj
                 break
 
-        if user:
-            # Crée un SecureUser temporaire pour générer le token
-            su = SecureUser(
-                username=username,
-                email=user["email"],
-                password=user["password"],
-                name=user.get("name", ""),
-                age=user.get("age", None),
-                country=user.get("country", "")
-            )
-            su.generate_reset_token()
-            # Affichage du token en console pour l’instant
-            print(f"[DEBUG] Token pour {email} : {su.reset_token}")
-            flash("✅ Code de réinitialisation envoyé à votre adresse e-mail ! (token en console pour test)", "success")
-        else:
-            flash("❌ Adresse e-mail inconnue", "error")
+        if not user_found:
+            flash("Email not found.", "error")
+            return redirect(url_for("forgot_password"))
+
+        su = SecureUser(
+            username=user_found.username,
+            email=user_found.email,
+            password=user_found.get_password(),
+            name=user_found.name,
+            age=user_found.age,
+            country=user_found.country
+        )
+        su.generate_reset_token()
+        print(f"[DEBUG] Reset token for {email}: {su.reset_token}")
+        flash("Password reset code sent (check console).", "success")
+        return redirect(url_for("home"))
 
     return render_template("forgot_password.html")
 
 
-# --- Lancer l'application ---
+# --- FEED (POSTS) ---
+@app.route("/feed", methods=["GET", "POST"])
+def feed():
+    if "username" not in session:
+        flash("Please sign in to access TwINSA.", "error")
+        return redirect(url_for("login"))
+
+    posts = load_posts()
+
+    if request.method == "POST":
+        content = request.form.get("tweet", "").strip()
+        if not content:
+            flash("Post cannot be empty!", "error")
+            return redirect(url_for("feed"))
+
+        # Crée un nouvel objet Post
+        new_post = Post(content, session["username"], db)
+
+        post_data = {
+            "poster_username": new_post.poster_username,
+            "content": new_post.content,
+            "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "likes": new_post.likes,
+            "comments": []
+        }
+
+        posts.insert(0, post_data)
+        save_posts(posts)
+        flash("Post created successfully!", "success")
+        return redirect(url_for("feed"))
+
+    return render_template("feed.html", username=session["username"], tweets=posts)
+
+
+# --- LIKE A POST ---
+@app.route("/like/<int:post_index>")
+def like(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    posts = load_posts()
+    if 0 <= post_index < len(posts):
+        post = posts[post_index]
+        username = session["username"]
+
+        if username in post["likes"]:
+            post["likes"].remove(username)
+        else:
+            post["likes"].append(username)
+
+        save_posts(posts)
+
+    return redirect(url_for("feed"))
+
+
+# --- COMMENT ON A POST ---
+@app.route("/comment/<int:post_index>", methods=["POST"])
+def comment(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    posts = load_posts()
+    if 0 <= post_index < len(posts):
+        comment_text = request.form.get("comment", "").strip()
+        if comment_text:
+            username = session["username"]
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            comment = {"username": username, "comment": comment_text, "date": now}
+
+            if "comments" not in posts[post_index]:
+                posts[post_index]["comments"] = []
+            posts[post_index]["comments"].append(comment)
+            save_posts(posts)
+
+    return redirect(url_for("feed"))
+
+@app.route("/delete_comment/<int:post_index>/<int:comment_index>")
+def delete_comment(post_index, comment_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    posts = load_posts()
+
+    if 0 <= post_index < len(posts):
+        comments = posts[post_index].get("comments", [])
+        if 0 <= comment_index < len(comments):
+            comment = comments[comment_index]
+            # Seul l’auteur du commentaire peut le supprimer
+            if comment["username"] == username:
+                comments.pop(comment_index)
+                posts[post_index]["comments"] = comments
+                save_posts(posts)
+                flash("Comment deleted successfully.", "success")
+
+    return redirect(url_for("feed"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
