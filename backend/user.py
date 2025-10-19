@@ -12,6 +12,8 @@ class User:
         self.posts = []  # List of Post objects
         self.likes = {}  # dict: post_id -> number of likes
         self.total_likes = sum(self.likes.values())
+        self.notifications = []
+        self.pending_requests = []
 
     def display_info(self):
         print(f"Name: {self.name}, Email: {self.email}, Age: {self.age}, Country: {self.country}")
