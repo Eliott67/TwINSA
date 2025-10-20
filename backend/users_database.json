@@ -10,43 +10,14 @@
         "followers": [],
         "following": []
     },
-<<<<<<< HEAD
     "bob": {
         "username": "bob",
         "email": "bob@email.com",
         "password": "Pass456!",
         "name": "Bob",
-<<<<<<< HEAD
         "age": 30,
         "country": "UK",
         "is_public": true,
-=======
-        "age": 28,
-        "country": "USA",
-        "is_public": false,
-        "followers": [
-            "mat"
-        ],
-        "following": []
-=======
-    "Eliott": {
-        "username": "Eliott",
-        "email": "eliottost@gmail.com",
-        "password": "Twinsa123!",
-        "name": "Eliott Oster",
-        "age": 20,
-        "country": "France"
->>>>>>> a5d4772 (Added profile page, improved feed design, fixed comments system)
-    },
-    "alice": {
-        "username": "alice",
-        "email": "alice@mail.com",
-        "password": "1234",
-        "name": "Alice",
-        "age": 25,
-        "country": "Canada",
-        "is_public": false,
->>>>>>> 6a931223485cf17f3081df3376baa527e6e6fc3b
         "followers": [],
         "following": []
     },
@@ -57,6 +28,17 @@
         "name": "Charlie",
         "age": 28,
         "country": "France",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "Pierre": {
+        "username": "Pierre",
+        "email": "pierre@gmail.com",
+        "password": "Pierre123!",
+        "name": "",
+        "age": 0,
+        "country": "",
         "is_public": true,
         "followers": [],
         "following": []
