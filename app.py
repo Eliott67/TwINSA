@@ -16,6 +16,7 @@ from backend.user import User
 from backend.change_password import SecureUser
 from backend.registration import validate_registration
 from backend.posting import Post
+from backend.editing_profile import update_personal_info, delete_account  # ✅ Ajout pour profil
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -226,6 +227,8 @@ def comment(post_index):
 
     return redirect(url_for("feed"))
 
+
+# --- DELETE A COMMENT ---
 @app.route("/delete_comment/<int:post_index>/<int:comment_index>")
 def delete_comment(post_index, comment_index):
     if "username" not in session:
@@ -246,6 +249,45 @@ def delete_comment(post_index, comment_index):
                 flash("Comment deleted successfully.", "success")
 
     return redirect(url_for("feed"))
+
+
+# --- PROFILE PAGE ---
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    if "username" not in session:
+        flash("Please sign in to access your profile.", "error")
+        return redirect(url_for("login"))
+
+    user = db.get_user(session["username"])
+
+    if request.method == "POST":
+        user.name = request.form.get("name", user.name)
+        user.age = int(request.form.get("age", user.age or 0)) if request.form.get("age") else user.age
+        user.country = request.form.get("country", user.country)
+        db.save_users()
+        flash("Profile updated successfully!", "success")
+
+    return render_template("profile.html", user=user)
+
+
+# --- DELETE ACCOUNT ---
+@app.route("/delete_account", methods=["POST"])
+def delete_account_route():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    password = request.form.get("password")
+
+    user = db.get_user(username)
+    if user and user.get_password() == password:
+        db.remove_user(username)
+        session.pop("username", None)
+        flash("Account deleted successfully.", "success")
+        return redirect(url_for("home"))
+    else:
+        flash("Incorrect password.", "error")
+        return redirect(url_for("profile"))
 
 
 if __name__ == "__main__":
