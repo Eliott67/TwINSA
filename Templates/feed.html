@@ -2,10 +2,13 @@
 {% block title %}Feed - TwINSA{% endblock %}
 
 {% block content %}
-<!-- Barre du haut avec bouton log out -->
+<!-- Barre du haut avec boutons profil et log out -->
 <div class="feed-header-top">
   <h2>Welcome, {{ username }} 👋</h2>
-  <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
+  <div class="feed-header-buttons">
+    <a href="{{ url_for('profile') }}" class="btn profile-btn">Profile</a>
+    <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
+  </div>
 </div>
 
 <div class="feed-container">
@@ -53,6 +56,8 @@
                 </div>
               {% endfor %}
             {% endif %}
+
+            <!-- Formulaire de commentaire -->
             <form action="{{ url_for('comment', post_index=loop.index0) }}" method="POST" class="comment-form">
               <input type="text" name="comment" placeholder="Add a comment..." maxlength="120">
               <button type="submit" class="comment-btn">💬</button>

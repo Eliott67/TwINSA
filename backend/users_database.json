@@ -12,6 +12,7 @@
             "bob"
         ]
     },
+<<<<<<< HEAD
     "bob": {
         "username": "bob",
         "email": "bob@mail.com",
@@ -24,6 +25,15 @@
             "mat"
         ],
         "following": []
+=======
+    "Eliott": {
+        "username": "Eliott",
+        "email": "eliottost@gmail.com",
+        "password": "Twinsa123!",
+        "name": "Eliott Oster",
+        "age": 20,
+        "country": "France"
+>>>>>>> a5d4772 (Added profile page, improved feed design, fixed comments system)
     },
     "alice": {
         "username": "alice",

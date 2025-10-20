@@ -175,3 +175,296 @@ body {
   .landing-right p { font-size: 1.1em; }
   .btn-large, .btn-secondary, .logout { width: 80%; }
 }
+
+/* === PROFILE PAGE === */
+.profile-container {
+  max-width: 500px;
+  margin: 80px auto;
+  background-color: #111;
+  padding: 25px 35px;
+  border-radius: 15px;
+  border: 1px solid #222;
+  box-shadow: 0 0 10px rgba(29, 161, 242, 0.1);
+}
+
+.profile-container h2 {
+  color: #1da1f2;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-form label {
+  display: block;
+  margin-top: 10px;
+  color: #aaa;
+  text-align: left;
+}
+
+.profile-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #0d0d0d;
+  color: #fff;
+  margin-top: 5px;
+}
+
+.btn-save {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #1da1f2;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background-color: #0d8ddb;
+}
+
+.delete-form {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.delete-form input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #0d0d0d;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #cc0000;
+}
+
+.profile-btn {
+  background-color: #1da1f2;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.profile-btn:hover {
+  background-color: #0d8ddb;
+}
+
+/* === PROFILE BUTTON === */
+.profile-btn {
+  background-color: #1da1f2;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.profile-btn:hover {
+  background-color: #0d8ddb;
+  transform: scale(1.05);
+}
+
+/* Alignement header feed */
+.feed-header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* === PROFILE PAGE === */
+.profile-container {
+  max-width: 500px;
+  margin: 80px auto;
+  background-color: #111;
+  padding: 25px 35px;
+  border-radius: 15px;
+  border: 1px solid #222;
+  box-shadow: 0 0 10px rgba(29, 161, 242, 0.1);
+}
+
+.profile-container h2 {
+  color: #1da1f2;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-form label {
+  display: block;
+  margin-top: 10px;
+  color: #aaa;
+  text-align: left;
+}
+
+.profile-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #0d0d0d;
+  color: #fff;
+  margin-top: 5px;
+}
+
+.btn-save {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #1da1f2;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background-color: #0d8ddb;
+}
+
+.delete-form {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.delete-form input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #0d0d0d;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #cc0000;
+}
+
+/* === PROFILE PAGE === */
+.profile-container {
+  max-width: 500px;
+  margin: 60px auto;
+  background-color: #111;
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #222;
+  box-shadow: 0 0 10px rgba(29,161,242,0.2);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.profile-header h2 {
+  color: #1da1f2;
+  font-size: 1.6em;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid #1da1f2;
+  color: #1da1f2;
+  padding: 8px 14px;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background-color: #1da1f2;
+  color: #fff;
+}
+
+.profile-form label {
+  display: block;
+  color: #ccc;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+.profile-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #0d0d0d;
+  color: #fff;
+  margin-top: 5px;
+}
+
+.btn-save {
+  background-color: #1da1f2;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background-color: #0d8ddb;
+}
+
+.delete-form {
+  margin-top: 25px;
+  background-color: #150000;
+  border: 1px solid #400;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.delete-form h3 {
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}
+
+.btn-delete {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #cc0000;
+}
