@@ -1,47 +1,32 @@
 {
-    "mat": {
-        "username": "mat",
-        "email": "mat@example.com",
+    "alice": {
+        "username": "alice",
+        "email": "alice@email.com",
         "password": "Pass123!",
-        "name": "Matthieu",
-        "age": 30,
-        "country": "France",
+        "name": "Alice",
+        "age": 25,
+        "country": "USA",
         "is_public": true,
         "followers": [],
-        "following": [
-            "bob"
-        ]
+        "following": []
     },
     "bob": {
         "username": "bob",
-        "email": "bob@mail.com",
-        "password": "5678",
+        "email": "bob@email.com",
+        "password": "Pass456!",
         "name": "Bob",
-        "age": 28,
-        "country": "USA",
-        "is_public": false,
-        "followers": [
-            "mat"
-        ],
-        "following": []
-    },
-    "alice": {
-        "username": "alice",
-        "email": "alice@mail.com",
-        "password": "1234",
-        "name": "Alice",
-        "age": 25,
-        "country": "Canada",
-        "is_public": false,
+        "age": 30,
+        "country": "UK",
+        "is_public": true,
         "followers": [],
         "following": []
     },
-    "matheo": {
-        "username": "matheo",
-        "email": "matheo@mail.com",
-        "password": "0000",
-        "name": "Matheo",
-        "age": 22,
+    "charlie": {
+        "username": "charlie",
+        "email": "charlie@email.com",
+        "password": "Pass789!",
+        "name": "Charlie",
+        "age": 28,
         "country": "France",
         "is_public": true,
         "followers": [],
