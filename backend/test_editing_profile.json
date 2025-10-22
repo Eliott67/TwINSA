@@ -1,0 +1,10 @@
+{
+    "ines": {
+        "username": "ines",
+        "email": "ines@mail.com",
+        "password": "pass123",
+        "name": "In\u00e9s",
+        "age": 20,
+        "country": "Andorra"
+    }
+}

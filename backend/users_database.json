@@ -1,32 +1,32 @@
 {
     "Perine": {
         "username": "Perine",
-        "email": "test@example.com",
+        "email": "perine@test.com",
         "password": "Pass123!",
-        "name": "perine",
+        "name": "Perine",
         "age": 20,
-        "country": "france"
+        "country": "France"
     },
     "Eliott": {
         "username": "Eliott",
-        "email": "eliottost@gmail.com",
+        "email": "eliott@test.com",
         "password": "Twinsa123!",
-        "name": "",
-        "age": 0,
-        "country": ""
+        "name": "Eliott",
+        "age": 22,
+        "country": "France"
     },
     "Jules": {
         "username": "Jules",
-        "email": "jules@gmail.com",
+        "email": "jules@test.com",
         "password": "123JULEs!",
-        "name": "",
-        "age": 0,
-        "country": ""
+        "name": "Jules",
+        "age": 21,
+        "country": "France"
     },
-    "PA": {
-        "username": "PA",
-        "email": "pierrearmand@gmail.com",
-        "password": "Salut000!",
+    "chadha": {
+        "username": "chadha",
+        "email": "raoaufi@insa-toulouse.fr",
+        "password": "Testchadha1234!!",
         "name": "",
         "age": 0,
         "country": ""
