@@ -2,11 +2,7 @@
 
 from users_db import UsersDatabase
 from user import User
-<<<<<<< HEAD:backend/search_userv2.py
 from login_logout import get_connected_users
-=======
-from Login_LogoutV2 import get_connected_users
->>>>>>> a5d4772 (Added profile page, improved feed design, fixed comments system):backend/search_user2.py
 
 def go_to_search_bar():
     print("\n--- Search Users ---")
@@ -215,10 +211,6 @@ if __name__ == "__main__":
     go_to_search_bar()
 
     print("\n=== TEST AVEC UN UTILISATEUR CONNECTÉ ===")
-<<<<<<< HEAD:backend/search_userv2.py
     from login_logout import login
-=======
-    from Login_LogoutV2 import login
->>>>>>> a5d4772 (Added profile page, improved feed design, fixed comments system):backend/search_user2.py
     login("mat", "Pass123!")  # devrait fonctionner maintenant
     go_to_search_bar()
