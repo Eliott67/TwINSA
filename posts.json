@@ -3,7 +3,15 @@
         "poster_username": "Eliott",
         "content": "Ceci est un test",
         "date": "2025-10-15 11:59:32",
-        "likes": [],
-        "comments": []
+        "likes": [
+            "Pierre"
+        ],
+        "comments": [
+            {
+                "username": "Pierre",
+                "comment": "Pas mal \u00e7a",
+                "date": "2025-10-20 17:13:53"
+            }
+        ]
     }
 ]
