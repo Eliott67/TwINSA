@@ -30,6 +30,46 @@
         "country": "France",
         "is_public": true,
         "followers": [],
+<<<<<<< HEAD
+=======
+        "following": [
+            "bob"
+        ]
+    },
+    "bob": {
+        "username": "bob",
+        "email": "bob@mail.com",
+        "password": "5678",
+        "name": "Bob",
+        "age": 28,
+        "country": "USA",
+        "is_public": false,
+        "followers": [
+            "mat"
+        ],
+        "following": []
+    },
+    "alice": {
+        "username": "alice",
+        "email": "alice@mail.com",
+        "password": "1234",
+        "name": "Alice",
+        "age": 25,
+        "country": "Canada",
+        "is_public": false,
+        "followers": [],
+>>>>>>> dd8c335 (ee)
+        "following": []
+    },
+    "Pierre": {
+        "username": "Pierre",
+        "email": "pierre@gmail.com",
+        "password": "Pierre123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
         "following": []
     },
     "Pierre": {
