@@ -2,11 +2,12 @@
 {% block title %}Feed - TwINSA{% endblock %}
 
 {% block content %}
-<!-- Barre du haut avec boutons profil et log out -->
+<!-- Barre du haut avec boutons profil et log out et recherche -->
 <div class="feed-header-top">
   <h2>Welcome, {{ username }} 👋</h2>
   <div class="feed-header-buttons">
-    <a href="{{ url_for('profile') }}" class="btn profile-btn">Profile</a>
+    <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
+    <a href="{{ url_for('search_users') }}" class="btn search-btn">Search</a>
     <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
   </div>
 </div>

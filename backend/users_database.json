@@ -30,8 +30,6 @@
         "country": "France",
         "is_public": true,
         "followers": [],
-<<<<<<< HEAD
-=======
         "following": [
             "bob"
         ]
@@ -58,7 +56,6 @@
         "country": "Canada",
         "is_public": false,
         "followers": [],
->>>>>>> dd8c335 (ee)
         "following": []
     },
     "Pierre": {
