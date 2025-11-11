@@ -252,22 +252,27 @@ def delete_comment(post_index, comment_index):
 
 
 # --- PROFILE PAGE ---
-@app.route("/profile", methods=["GET", "POST"])
-def profile():
+@app.route("/profile/<username>", methods=["GET", "POST"])
+def profile(username):
     if "username" not in session:
         flash("Please sign in to access your profile.", "error")
         return redirect(url_for("login"))
 
-    user = db.get_user(session["username"])
+    current_user = db.get_user(session["username"])  # connecté
+    user = db.get_user(username)  # profil à afficher
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("feed")) 
+    can_view = user.is_public or current_user.follows(user) or user.username == current_user.username
 
-    if request.method == "POST":
+    if user.username == current_user.username and request.method == "POST":
         user.name = request.form.get("name", user.name)
         user.age = int(request.form.get("age", user.age or 0)) if request.form.get("age") else user.age
         user.country = request.form.get("country", user.country)
         db.save_users()
         flash("Profile updated successfully!", "success")
 
-    return render_template("profile.html", user=user)
+    return render_template("profile.html", user=user, current_user=current_user, can_view=can_view)
 
 
 # --- DELETE ACCOUNT ---
@@ -287,8 +292,181 @@ def delete_account_route():
         return redirect(url_for("home"))
     else:
         flash("Incorrect password.", "error")
-        return redirect(url_for("profile"))
+        return redirect(url_for("profile", username=session["username"]))
 
+# --- SEARCH USERS ---
+@app.route("/search", methods=["GET", "POST"])
+def search_users():
+    if "username" not in session:
+        flash("Please sign in to access search.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+
+    # Historique de recherche stocké dans la session
+    if "search_history" not in session:
+        session["search_history"] = []
+
+    results = []
+
+    if request.method == "POST":
+        query = request.form.get("query", "").strip()
+        if query:
+            all_users = db.get_all_users()
+            # Recherche par prefixe (insensible à la casse)
+            matches = [u for u in all_users if u.username.lower().startswith(query.lower())]
+
+            # Trier : d'abord les suivis, puis alphabétique
+            matches.sort(key=lambda u: (not current_user.follows(u), u.username.lower()))
+            results = matches[:10]
+
+            # Mettre à jour l'historique
+            if query not in session["search_history"]:
+                session["search_history"].insert(0, query)
+            session["search_history"] = session["search_history"][:5]
+            session.modified = True  # pour que Flask enregistre la session
+
+    return render_template(
+        "search.html",
+        current_user=current_user,
+        results=results,
+        history=session.get("search_history", [])
+    )
+
+# --- VIEW PROFILE ---
+@app.route("/view_profile/<username>")
+def view_profile(username):
+    if "username" not in session:
+        flash("Please sign in to view profiles.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user = db.get_user(username)
+
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("search_users"))
+
+    # Vérifier la visibilité du profil
+    can_view = user.is_public or current_user.follows(user)
+
+    return render_template(
+        "profile.html",
+        user=user,
+        current_user=current_user,
+        can_view=can_view
+    )
+
+# --- FOLLOW USER ---
+@app.route("/follow/<username>", methods=["POST"])
+def follow_user(username):
+    if "username" not in session:
+        flash("Please sign in to follow users.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user_to_follow = db.get_user(username)
+    if user_to_follow:
+        current_user.follow(user_to_follow)
+        flash(f"You are now following {username}", "success")
+    else:
+        flash("User not found.", "error")
+    return redirect(request.referrer or url_for("feed"))
+
+# --- UNFOLLOW USER ---
+@app.route("/unfollow/<username>", methods=["POST"])
+def unfollow_user(username):
+    if "username" not in session:
+        flash("Please sign in to unfollow users.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user_to_unfollow = db.get_user(username)
+    if user_to_unfollow:
+        current_user.unfollow(user_to_unfollow)
+        flash(f"You have unfollowed {username}", "success")
+    else:
+        flash("User not found.", "error")
+    return redirect(request.referrer or url_for("feed"))
+
+# -- BLOCK USER --
+@app.route("/block/<username>", methods=["POST"])
+def block_user(username):
+    if "username" not in session:
+        flash("Please sign in to block users.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user_to_block = db.get_user(username)
+    if user_to_block:
+        current_user.block(user_to_block)
+        flash(f"{username} has been blocked.", "success")
+    else:
+        flash("User not found.", "error")
+    return redirect(request.referrer or url_for("feed"))
+
+# --- UNBLOCK USER ---
+@app.route("/unblock/<username>", methods=["POST"])
+def unblock_user(username):
+    if "username" not in session:
+        flash("Please sign in to unblock users.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user_to_unblock = db.get_user(username)
+    if user_to_unblock:
+        current_user.unblock(user_to_unblock)
+        flash(f"{username} has been unblocked.", "success")
+    else:
+        flash("User not found.", "error")
+    return redirect(request.referrer or url_for("feed"))
+
+# --- VIEW FOLLOWERS ---
+@app.route("/followers/<username>")
+def view_followers(username):
+    if "username" not in session:
+        flash("Please sign in to view followers.", "error")
+        return redirect(url_for("login"))
+
+    user = db.get_user(username)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("feed"))
+
+    followers = user.followers  # liste d'objets User qui suivent cet utilisateur
+    current_user = db.get_user(session["username"])
+
+    return render_template("followers.html", user=user, followers=followers, current_user=current_user)
+
+
+# --- VIEW FOLLOWING ---
+@app.route("/following/<username>")
+def view_following(username):
+    if "username" not in session:
+        flash("Please sign in to view following.", "error")
+        return redirect(url_for("login"))
+
+    user = db.get_user(username)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("feed"))
+
+    following = user.following  # liste d'objets User que cet utilisateur suit
+    current_user = db.get_user(session["username"])
+
+    return render_template("following.html", user=user, following=following, current_user=current_user)
+
+# --- CLEAR SEARCH HISTORY ---
+@app.route("/clear_search_history", methods=["POST"])
+def clear_search_history():
+    if "username" not in session:
+        flash("Please sign in to clear history.", "error")
+        return redirect(url_for("login"))
+
+    session["search_history"] = []
+    session.modified = True
+    flash("Search history cleared.", "success")
+    return redirect(url_for("search_users"))
 
 if __name__ == "__main__":
     app.run(debug=True)

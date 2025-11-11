@@ -189,7 +189,7 @@ if __name__ == "__main__":
     user_bob = User(
         username="bob",
         email="bob@mail.com",
-        password="5678",  # doit correspondre au mot de passe du login
+        password="Pass5678!",  # doit correspondre au mot de passe du login
         name="Bob",
         age=28,
         country="USA",
@@ -201,8 +201,8 @@ if __name__ == "__main__":
     db.save_users()
 
     # Optionnel : ajouter d'autres utilisateurs à rechercher
-    db.add_user(User("alice", "alice@mail.com", "1234", "Alice", 25, "Canada",is_public=False))
-    db.add_user(User("matheo", "matheo@mail.com", "0000", "Matheo", 22, "France",is_public=True))
+    db.add_user(User("alice", "alice@mail.com", "Pass1234!", "Alice", 25, "Canada",is_public=False))
+    db.add_user(User("matheo", "matheo@mail.com", "Pass0000!", "Matheo", 22, "France",is_public=True))
 
     print("Base de test initialisée avec les utilisateurs : mat, alice, bob, matheo")
 

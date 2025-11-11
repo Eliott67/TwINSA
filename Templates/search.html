@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Search Users - TwINSA{% endblock %}
+
+{% block content %}
+<h1>Search Users</h1>
+
+<div class="search-header">
+  <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
+</div>
+
+<form method="POST" class="search-form">
+    <input type="text" name="query" placeholder="Search users..." required>
+    <button type="submit">🔍 Search</button>
+</form>
+
+{% if history %}
+<h3>Recent Searches:</h3>
+<ul>
+    {% for h in history %}
+    <li>{{ h }}</li>
+    {% endfor %}
+</ul>
+  <form action="{{ url_for('clear_search_history') }}" method="POST">
+      <button type="submit" class="btn-clear">Clear History</button>
+  </form>
+{% endif %}
+
+{% if results %}
+<h3>Results:</h3>
+<ul>
+    {% for u in results %}
+    <li>
+        {{ u.username }} {% if current_user.follows(u) %}(Followed){% endif %}
+        - <a href="{{ url_for('view_profile', username=u.username) }}">View Profile</a>
+        {% if not current_user.follows(u) and u.username != current_user.username %}
+        - <a href="{{ url_for('follow_user', username=u.username) }}">Follow</a>
+       {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
