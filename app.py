@@ -110,8 +110,12 @@ def register():
 
         try:
             db.add_user(new_user)
+            session["username"] = new_user.username
             flash("Account created successfully!", "success")
-            return redirect(url_for("login"))
+            return redirect(url_for("suggestions"))
+
+            #flash("Account created successfully!", "success")
+            #return redirect(url_for("login"))
         except ValueError:
             flash("Username already exists.", "error")
             return redirect(url_for("register"))
@@ -467,6 +471,31 @@ def clear_search_history():
     session.modified = True
     flash("Search history cleared.", "success")
     return redirect(url_for("search_users"))
+
+# --- SUGGESTIONS ---
+@app.route("/suggestions")
+def suggestions():
+    if "username" not in session:
+        flash("Please sign in to view suggestions.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    all_users = db.get_all_users()
+
+    # Filtrer : public, non suivi et pas bloqué
+    suggested_users = [
+        u for u in all_users
+        if u.username != current_user.username
+        and current_user.follows(u) == False
+        and u.username not in current_user.blocked_users
+        and u.is_public
+    ]
+
+    # On peut trier par nombre de followers décroissant
+    suggested_users.sort(key=lambda u: len(u.followers), reverse=True)
+
+    return render_template("suggestions.html", current_user=current_user, suggested_users=suggested_users)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
