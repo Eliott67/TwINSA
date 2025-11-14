@@ -79,5 +79,38 @@
         "is_public": true,
         "followers": [],
         "following": []
+    },
+    "albert": {
+        "username": "albert",
+        "email": "coucou@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "In\u00e9s": {
+        "username": "In\u00e9s",
+        "email": "inesbafaluy@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "Alex": {
+        "username": "Alex",
+        "email": "alex@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }

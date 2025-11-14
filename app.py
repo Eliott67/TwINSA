@@ -163,6 +163,8 @@ def feed():
         return redirect(url_for("login"))
 
     posts = load_posts()
+    username = session["username"]
+    current_user = db.get_user(username)
 
     if request.method == "POST":
         content = request.form.get("tweet", "").strip()
@@ -185,8 +187,36 @@ def feed():
         save_posts(posts)
         flash("Post created successfully!", "success")
         return redirect(url_for("feed"))
+    
+    # Last 20 notifications
+    notifications = []
+    if current_user is not None and hasattr(current_user, "notifications"):
+        notifications = list(current_user.notifications)[-20:]
+        notifications.reverse()
 
-    return render_template("feed.html", username=session["username"], tweets=posts)
+    return render_template("feed.html", username=session["username"], tweets=posts,notifications=notifications)
+
+# --- NOTIFICATIONS PAGE ---
+@app.route("/notifications")
+def notifications():
+    if "username" not in session:
+        flash("Please sign in to view notifications.", "error")
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    current_user = db.get_user(username)
+
+    # Last 20 notifications
+    notifications = []
+    if current_user is not None and hasattr(current_user, "notifications"):
+        notifications = list(current_user.notifications)[-20:]
+        notifications.reverse()
+
+    return render_template(
+        "notifications.html",
+        username=username,
+        notifications=notifications
+    )
 
 
 # --- LIKE A POST ---
