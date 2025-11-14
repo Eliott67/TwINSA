@@ -1,11 +1,13 @@
 import datetime
 from user import User
 from users_db import UsersDatabase
+from notification import LikeNotification, CommentNotification
 
 class Post:
     def __init__(self, content, poster_username, database):
         self.poster_username = poster_username
-        self.user = database.get_user(self.poster_username)
+        self.database = database
+        self.user = self.database.get_user(self.poster_username)
         self.content = content  # Pas de filtrage
         self.date = datetime.datetime.now()
         self.likes = []
@@ -30,6 +32,10 @@ class Post:
         if username not in self.likes:
             self.likes.append(username)
         self.update_likes()
+        liker = self.database.get_user(username)
+        liked = self.user
+        like_notification = LikeNotification(liker, liked, self)
+        like_notification.send()    
 
     def remove_like(self, username):
         if username in self.likes:
@@ -46,6 +52,11 @@ class Post:
             "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
         self.update_poster_list_posts()
+
+        commenter = self.database.get_user(commenter_username)
+        commented = self.user
+        comment_notification = CommentNotification(commenter, commented, self, comment)
+        comment_notification.send()
 
     def remove_comment(self, id_comment, deleter_username):
         for c in list(self.comments):

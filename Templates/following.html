@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Following - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="following-container">
+  <h2>{{ user.username }} is Following</h2>
+
+  {% if following %}
+    <ul>
+      {% for u in following %}
+        <li>
+          <a href="{{ url_for('view_profile', username=u.username) }}">{{ u.username }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{{ user.username }} is not following anyone yet.</p>
+  {% endif %}
+
+  <a href="{{ url_for('profile', username=user.username) }}" class="btn back-btn">← Back to Profile</a>
+</div>
+{% endblock %}
