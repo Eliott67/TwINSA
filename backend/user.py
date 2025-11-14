@@ -1,3 +1,5 @@
+import notification
+
 class User:
     def __init__(self, username, email, password, name, age, country, is_public=True):
         self.username = username
@@ -9,9 +11,12 @@ class User:
         self.is_public = is_public
         self.followers = []
         self.following = []
+        self.blocked_users = []
         self.posts = []  # List of Post objects
         self.likes = {}  # dict: post_id -> number of likes
         self.total_likes = sum(self.likes.values())
+        self.notifications = []
+        self.pending_requests = []
 
     def display_info(self):
         print(f"Name: {self.name}, Email: {self.email}, Age: {self.age}, Country: {self.country}")
@@ -49,8 +54,92 @@ class User:
         if post in self.posts:
             self.posts.remove(post)
 
-    def follows(self, other_user):
+    def follows(self, other_user): #fonction de test
          # Vérifie si self suit other_user
          return other_user.username in self.following
 
+    def unfollow(self, target_user):
+        if target_user.username in self.following:
+            self.following.remove(target_user.username)
+            if self.username in target_user.followers:
+                target_user.followers.remove(self.username)
+            print(f"You unfollowed {target_user.username}.")
+        else:
+            print(f"You are not following {target_user.username}.")
+
+    def display_followers(self):
+        print(f"{self.username}'s followers:")
+        for u in self.followers:
+            print(f"- {u}")
+
+    def display_following(self):
+        print(f"{self.username} is following:")
+        for u in self.following:
+            print(f"- {u}")
+
+    def follow(self, target_user):
+        if target_user.username in self.following:
+            print(f"You are already following {target_user.username}.")
+            return
         
+        if self.username in target_user.blocked_users:
+            print(f"You cannot follow {target_user.username}. You are blocked.")
+            return
+
+        if target_user.username in self.blocked_users:
+            print(f"You have blocked {target_user.username}. Unblock them to follow.")
+            return
+
+        if target_user.is_public:
+            self.add_following(target_user.username)
+            target_user.add_follower(self.username)
+
+            # Notification
+            notif = notification.NewFollowerNotification(sender=self, receiver=target_user)
+            notif.send()
+
+            print(f"You are now following {target_user.username}.")
+        else:
+            # Follow request
+            request = notification.FollowRequestNotification(sender=self, receiver=target_user)
+            request.send_request()
+            print(f"Follow request sent to {target_user.username}.")
+
+    def get_common_friends(self, other_user):
+        common = set(self.following) & set(other_user.following)
+        if common:
+            print(f"Common friends with {other_user.username}:")
+            for friend in common:
+                print(f"- {friend}")
+        else:
+            print(f"No common friends with {other_user.username}.")
+
+    def block(self, target_user):
+        if target_user.username not in self.blocked_users:
+            self.blocked_users.append(target_user.username)
+            print(f"{target_user.username} has been blocked.")
+
+            # Remove them from your followers
+            if target_user.username in self.followers:
+                self.followers.remove(target_user.username)
+            if self.username in target_user.following:
+                target_user.following.remove(self.username)
+
+            # Remove from your following
+            if target_user.username in self.following:
+                self.following.remove(target_user.username)
+            if self.username in target_user.followers:
+                target_user.followers.remove(self.username)
+        else:
+            print(f"{target_user.username} is already blocked.")
+
+    def blocks(self, other_user): #fonction de test
+         # Vérifie si self bloque other_user
+         return other_user.username in self.blocked_users
+
+    def unblock(self, target_user):
+        if target_user.username in self.blocked_users:
+            self.blocked_users.remove(target_user.username)
+            print(f"You have unblocked {target_user.username}.")
+        else:
+            print(f"{target_user.username} is not in your blocked list.")

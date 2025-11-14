@@ -1,34 +1,116 @@
 {
-    "Perine": {
-        "username": "Perine",
-        "email": "perine@test.com",
-        "password": "Pass123!",
-        "name": "Perine",
-        "age": 20,
-        "country": "France"
+    "alice": {
+        "username": "alice",
+        "email": "alice@mail.com",
+        "password": "1234",
+        "name": "Alice",
+        "age": 25,
+        "country": "Canada",
+        "is_public": false,
+        "followers": [],
+        "following": []
     },
-    "Eliott": {
-        "username": "Eliott",
-        "email": "eliott@test.com",
-        "password": "Twinsa123!",
-        "name": "Eliott",
-        "age": 22,
-        "country": "France"
+    "bob": {
+        "username": "bob",
+        "email": "bob@mail.com",
+        "password": "5678",
+        "name": "Bob",
+        "age": 28,
+        "country": "USA",
+        "is_public": false,
+        "followers": [
+            "mat"
+        ],
+        "following": []
     },
-    "Jules": {
-        "username": "Jules",
-        "email": "jules@test.com",
-        "password": "123JULEs!",
-        "name": "Jules",
-        "age": 21,
-        "country": "France"
+    "charlie": {
+        "username": "charlie",
+        "email": "charlie@email.com",
+        "password": "Pass789!",
+        "name": "Charlie",
+        "age": 28,
+        "country": "France",
+        "is_public": true,
+        "followers": [],
+        "following": [
+            "bob"
+        ]
     },
-    "chadha": {
-        "username": "chadha",
-        "email": "raoaufi@insa-toulouse.fr",
-        "password": "Testchadha1234!!",
+    "Pierre": {
+        "username": "Pierre",
+        "email": "pierre@gmail.com",
+        "password": "Pierre123!",
         "name": "",
         "age": 0,
-        "country": ""
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "perine": {
+        "username": "perine",
+        "email": "perine@mail.com",
+        "password": "Pass123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "perine2": {
+        "username": "perine2",
+        "email": "perine2@mail.com",
+        "password": "Pass1234!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "perine3": {
+        "username": "perine3",
+        "email": "perine3@mail.com",
+        "password": "Pass234!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "albert": {
+        "username": "albert",
+        "email": "coucou@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "In\u00e9s": {
+        "username": "In\u00e9s",
+        "email": "inesbafaluy@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "Alex": {
+        "username": "Alex",
+        "email": "alex@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }
