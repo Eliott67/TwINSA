@@ -112,5 +112,60 @@
         "is_public": true,
         "followers": [],
         "following": []
+    },
+    "lolo": {
+        "username": "lolo",
+        "email": "lolo@gmail.com",
+        "password": "Azerty12345\u00a7\u00a7",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "chadha": {
+        "username": "chadha",
+        "email": "chadha@gmail.com",
+        "password": "Azerty123\u00a7\u00a7",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "chadha2": {
+        "username": "chadha2",
+        "email": "cha@gmail.com",
+        "password": "Abcd123456789\u00a7\u00a7",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "loop": {
+        "username": "loop",
+        "email": "loop@gmail.com",
+        "password": "Loop123456789@",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
+    },
+    "popo": {
+        "username": "popo",
+        "email": "popo@gmail.com",
+        "password": "Popo123456789@",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }
