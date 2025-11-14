@@ -156,6 +156,10 @@
               <a href="{{ url_for('like', post_index=loop.index0) }}" class="like-btn">
                 ❤️ {{ tweet.likes|length }}
               </a>
+              {% if true %}
+              <button class="edit-btn">✏️ Edit</button>
+              <button class="delete-btn">🗑️ Delete</button>
+              {% endif %}
             </div>
 
             <!-- Zone de commentaires -->
@@ -190,10 +194,9 @@
   </div>
 </div> 
 
-<!-- Script compteur -->
+<!-- Script principal -->
 <script>
-
-  // Sidebar toggle
+  // --- Sidebar toggle ---
   const notifToggle = document.getElementById('notifToggle');
   const notifSidebar = document.getElementById('notifSidebar');
 
@@ -203,13 +206,42 @@
     });
   }
 
-const tweetBox = document.getElementById('tweetBox');
-const charCount = document.getElementById('charCount');
+  // --- Compteur de caractères pour le tweet ---
+  const tweetBox = document.getElementById('tweetBox');
+  const charCount = document.getElementById('charCount');
 
-tweetBox.addEventListener('input', () => {
-  const length = tweetBox.value.length;
-  charCount.textContent = `${length} / 180`;
-  charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
-});
+  tweetBox.addEventListener('input', () => {
+    const length = tweetBox.value.length;
+    charCount.textContent = `${length} / 180`;
+    charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
+  });
+
+  // --- Edit / Delete posts ---
+  document.querySelectorAll('.tweet').forEach(tweetDiv => {
+    const contentP = tweetDiv.querySelector('p'); // le contenu du post
+    const editBtn = tweetDiv.querySelector('.edit-btn');
+    const deleteBtn = tweetDiv.querySelector('.delete-btn');
+
+    if(editBtn){
+      editBtn.addEventListener('click', () => {
+        const newContent = prompt("Edit your post:", contentP.textContent);
+        if(newContent !== null && newContent.trim() !== ""){
+          contentP.textContent = newContent;
+          alert("Post mis à jour !");
+          // TODO : connecter à ton backend Python pour sauvegarder
+        }
+      });
+    }
+
+    if(deleteBtn){
+      deleteBtn.addEventListener('click', () => {
+        if(confirm("Confirmez la suppression ?")){
+          tweetDiv.remove();
+          alert("Post supprimé !");
+          // TODO : connecter à ton backend Python pour supprimer le post
+        }
+      });
+    }
+  });
 </script>
 {% endblock %}
