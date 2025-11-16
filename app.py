@@ -17,6 +17,7 @@ from backend.change_password import SecureUser
 from backend.registration import validate_registration
 from backend.posting import Post
 from backend.editing_profile import update_personal_info, delete_account  # ✅ Ajout pour profil
+from backend.notification import FollowRequestNotification
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -367,6 +368,27 @@ def search_users():
         history=session.get("search_history", [])
     )
 
+# --- SEARCH Suggestions  ---
+@app.route("/api/search_suggestions")
+def search_suggestions():
+    if "username" not in session:
+        return {"results": []}
+
+    query = request.args.get("q", "").strip().lower()
+    if not query:
+        return {"results": []}
+
+    current_user = db.get_user(session["username"])
+    all_users = db.get_all_users()
+
+    # Même logique que ta console : match par préfixe
+    matches = [u.username for u in all_users if u.username.lower().startswith(query)]
+
+    # Trier : suivis d’abord, puis alphabétique
+    matches.sort(key=lambda uname: (not current_user.follows(db.get_user(uname)), uname.lower()))
+
+    return {"results": matches[:10]}
+
 # --- VIEW PROFILE ---
 @app.route("/view_profile/<username>")
 def view_profile(username):
@@ -422,6 +444,29 @@ def unfollow_user(username):
     else:
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
+
+# -- SEND FOLLOW REQUEST --
+@app.route('/send_follow_request/<username>', methods=['POST'])
+def send_follow_request(username):
+    if "username" not in session:
+        flash("Please sign in to send follow requests.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user = db.get_user(username)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for('search_users'))
+
+    if user.username == current_user.username or current_user.follows(user):
+        flash("Cannot follow this user.", "error")
+        return redirect(url_for('search_users'))
+
+    notif = FollowRequestNotification(sender=current_user, receiver=user)
+    notif.send_request()
+
+    flash(f"Follow request sent to {user.username}!", "success")
+    return redirect(url_for('search_users'))
 
 # -- BLOCK USER --
 @app.route("/block/<username>", methods=["POST"])
