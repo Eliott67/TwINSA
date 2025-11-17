@@ -2,84 +2,304 @@
 {% block title %}Search Users - TwINSA{% endblock %}
 
 {% block content %}
-<h1>Search Users</h1>
 
-<div class="search-header">
-  <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
-</div>
+<style>
+  .search-page {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
 
-<form method="POST" class="search-form">
+  .search-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .search-header .back-btn {
+    font-size: 0.9rem;
+  }
+
+  /* 🔵 Grosse barre centrée */
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 auto;
+    margin-bottom: 0.75rem;
+    max-width: 600px;
+  }
+
+  .search-form input[name="query"] {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .search-form input[name="query"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+  }
+
+  /* IMPORTANT : on retire le bleu local pour laisser profile-btn faire le styling */
+  .search-form button {
+    border-radius: 999px;
+    padding: 0.7rem 1.1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    border: none;
+  }
+
+  /* Suggestions live */
+  .suggestions-list {
+    list-style: none;
+    max-width: 600px;
+    margin: 0.25rem auto 1.5rem auto;
+    padding: 0;
+    border-radius: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+
+  .suggestions-list li {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .suggestions-list li a {
+    text-decoration: none;
+    color: #111827;
+    display: block;
+  }
+
+  .suggestions-list li a:hover {
+    text-decoration: underline;
+  }
+
+  /* Historique */
+  .search-history {
+    max-width: 600px;
+    margin: 0 auto 1.5rem auto;
+    font-size: 0.9rem;
+  }
+
+  .search-history h3 {
+    margin-bottom: 0.4rem;
+  }
+
+  .search-history ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .search-history li {
+    padding: 0.15rem 0;
+    color: #4b5563;
+  }
+
+  .btn-clear {
+    font-size: 0.8rem;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  /* Résultats */
+  .results-section {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .results-section h3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+  }
+
+  .user-main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .user-username {
+    font-weight: 600;
+  }
+
+  .user-tag {
+    font-size: 0.8rem;
+    color: #10b981;
+    margin-left: 0.4rem;
+  }
+
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-view {
+    background: #e5e7eb;
+    color: #111827;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-follow {
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+  }
+
+  .btn-unfollow {
+    background: #f87171;
+    color: white;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+  }
+
+  .btn-request {
+    background: #fbbf24;
+    color: #111827;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+  }
+</style>
+
+<div class="search-page">
+
+  <!-- Titre -->
+  <div class="search-top-row">
+    <h1 class="search-title">Search Users</h1>
+    <div class="search-header">
+      <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
+    </div>
+  </div>
+
+  <!-- 🔵 GROSSE BARRE DE RECHERCHE AVEC BOUTON BLEU -->
+  <form method="POST" class="search-form">
     <input type="text" name="query" placeholder="Search users..." required>
-    <button type="submit">🔍 Search</button>
-</form>
-
-{% if history %}
-<h3>Recent Searches:</h3>
-<ul>
-    {% for h in history %}
-    <li>{{ h }}</li>
-    {% endfor %}
-</ul>
-  <form action="{{ url_for('clear_search_history') }}" method="POST">
-      <button type="submit" class="btn-clear">Clear History</button>
+    <button type="submit" class="btn profile-btn">🔍 Search</button>
   </form>
-{% endif %}
 
-{% if results %}
-<h3>Results:</h3>
-<ul>
-    {% for u in results %}
-    <li>
-        {{ u.username }} 
-        {% if current_user.follows(u) %}
-            (Followed)
-        {% endif %}
-        - <a href="{{ url_for('view_profile', username=u.username) }}">View Profile</a>
-        {% if not current_user.follows(u) and u.username != current_user.username %}
-        - <form action="{{ url_for('follow_user', username=u.username) }}"
-            method="POST"
-            style="display:inline;">
-            <button type="submit" class="btn-link">Follow</button>
-        </form>
+  <!-- Suggestions -->
+  <ul id="suggestions" class="suggestions-list"></ul>
 
-       {% endif %}
+  <!-- Historique -->
+  {% if history %}
+  <div class="search-history">
+    <h3>Recent Searches</h3>
+    <ul>
+      {% for h in history %}
+      <li>{{ h }}</li>
+      {% endfor %}
+    </ul>
+    <form action="{{ url_for('clear_search_history') }}" method="POST">
+      <button type="submit" class="btn-clear">Clear History</button>
+    </form>
+  </div>
+  {% endif %}
 
-        {% if u.username != current_user.username %}
-            {% if current_user.follows(u) %}
-            <!-- Unfollow form -->
-            <form action="{{ url_for('unfollow_user', username=u.username) }}" method="POST" style="display:inline;">
-                <button type="submit">Unfollow</button>
-            </form>
-            {% else %}
+  <!-- Résultats -->
+  {% if results %}
+  <div class="results-section">
+    <h3>Results</h3>
+
+    <ul class="results-list">
+      {% for u in results %}
+      <li>
+        <div class="user-card">
+          
+          <div class="user-main">
+            <span class="user-username">
+              {{ u.username }}
+              {% if current_user.follows(u) %}
+              <span class="user-tag">Followed</span>
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="user-actions">
+
+            <!-- View -->
+            <a href="{{ url_for('view_profile', username=u.username) }}" class="btn-view">View</a>
+
+            <!-- Follow / Unfollow -->
+            {% if u.username != current_user.username %}
+
+              {% if current_user.follows(u) %}
+              <form action="{{ url_for('unfollow_user', username=u.username) }}" method="POST">
+                <button type="submit" class="btn-unfollow">Unfollow</button>
+              </form>
+
+              {% else %}
                 {% if u.is_public %}
-                    <!-- Follow form -->
-                    <form action="{{ url_for('follow_user', username=u.username) }}" method="POST" style="display:inline;">
-                        <button type="submit">Follow</button>
-                    </form>
-                {% else %}
-                    <!-- Private user: Send follow request -->
-                    <form action="{{ url_for('send_follow_request', username=u.username) }}" method="POST" style="display:inline;">
-                        <button type="submit">Send follow request</button>
-                    </form>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
+                <form action="{{ url_for('follow_user', username=u.username) }}" method="POST">
+                  <button type="submit" class="btn-follow">Follow</button>
+                </form>
 
-<ul id="suggestions" class="suggestions-list"></ul>
+                {% else %}
+                <form action="{{ url_for('send_follow_request', username=u.username) }}" method="POST">
+                  <button type="submit" class="btn-request">Request</button>
+                </form>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+
+          </div>
+
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+  {% endif %}
+
+</div>
 
 <script>
 const input = document.querySelector('input[name="query"]');
 const suggestionsList = document.getElementById("suggestions");
 
-input.addEventListener("input", async () => {
+if (input) {
+  input.addEventListener("input", async () => {
     const q = input.value.trim();
     if (q.length === 0) {
-        suggestionsList.innerHTML = "";
-        return;
+      suggestionsList.innerHTML = "";
+      return;
     }
 
     const res = await fetch(`/api/search_suggestions?q=${encodeURIComponent(q)}`);
@@ -87,11 +307,12 @@ input.addEventListener("input", async () => {
 
     suggestionsList.innerHTML = "";
     data.results.forEach(user => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="/view_profile/${user}">${user}</a>`;
-        suggestionsList.appendChild(li);
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="/view_profile/${user}">${user}</a>`;
+      suggestionsList.appendChild(li);
     });
-});
+  });
+}
 </script>
 
 {% endblock %}
