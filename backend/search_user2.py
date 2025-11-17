@@ -2,7 +2,7 @@
 
 from users_db import UsersDatabase
 from user import User
-from Login_logout_v2 import get_connected_users
+from login_logout import get_connected_users
 
 def go_to_search_bar():
     print("\n--- Search Users ---")
@@ -93,8 +93,69 @@ def go_to_search_bar():
                 print(f"- Age: {user.age}")
                 print(f"- Country: {user.country}")
                 print(f"- Account Type: {'Public' if user.is_public else 'Private'}")
+                # ➕ Ajout : sous-menu pour voir followers/following
+                while True:
+                    print("\nView:")
+                    print("1. Followers")
+                    print("2. Following")
+                    if current_user.follows(user):
+                        print("3. Unfollow")
+                    else:
+                        print("3. Follow")
+                    if current_user.blocks(user):
+                        print("4. Unblock")
+                    else:
+                        print("4. Block")
+                    print("5. View common friends")
+                    print("6. Back to Search Menu")
+                    sub_choice = input("Choose an option: ")
+
+                    if sub_choice == "1":
+                        user.display_followers()
+                    elif sub_choice == "2":
+                        user.display_following()
+                    elif sub_choice == "3":
+                        if current_user.follows(user):
+                            current_user.unfollow(user)
+                        else:
+                            current_user.follow(user)
+                    elif sub_choice == "4":
+                        if current_user.blocks(user):
+                            current_user.unblock(user)
+                        else:
+                            current_user.block(user)
+                    elif sub_choice == "5":
+                        current_user.get_common_friends(user)
+                    elif sub_choice == "6":
+                        break
+                    else:
+                        print("Invalid choice.")
+
+            
             else:
                 print("This account is private. Follow the user to see more information.")
+                while True:
+                    print("\nActions:")
+                    print("1. Send Follow Request")
+                    if current_user.blocks(user):
+                        print("2. Unblock")
+                    else:
+                        print("2. Block")
+                    print("3. Back to Search Menu")
+                    sub_choice = input("Choose an option: ")
+
+                    if sub_choice == "1":
+                        current_user.follow(user)  # Cela va envoyer une demande
+                    elif sub_choice == "2":
+                        if current_user.blocks(user):
+                            current_user.unblock(user)
+                        else:
+                            current_user.block(user)
+                    elif sub_choice == "3":
+                        break
+                    else:
+                        print("Invalid choice.")
+
 
         elif choice == "5":
             print("Exiting search.")
@@ -124,10 +185,24 @@ if __name__ == "__main__":
     )
     db.add_user(user_mat)
 
+# Création de l'utilisateur "bob"
+    user_bob = User(
+        username="bob",
+        email="bob@mail.com",
+        password="Pass5678!",  # doit correspondre au mot de passe du login
+        name="Bob",
+        age=28,
+        country="USA",
+        is_public=False
+    )
+    db.add_user(user_bob)
+    user_mat.add_following(user_bob.username)  # mat suit bob
+    user_bob.add_follower(user_mat.username)   # bob a mat comme follower
+    db.save_users()
+
     # Optionnel : ajouter d'autres utilisateurs à rechercher
-    db.add_user(User("alice", "alice@mail.com", "1234", "Alice", 25, "Canada",is_public=False))
-    db.add_user(User("bob", "bob@mail.com", "5678", "Bob", 28, "USA",is_public=False))
-    db.add_user(User("matheo", "matheo@mail.com", "0000", "Matheo", 22, "France",is_public=True))
+    db.add_user(User("alice", "alice@mail.com", "Pass1234!", "Alice", 25, "Canada",is_public=False))
+    db.add_user(User("matheo", "matheo@mail.com", "Pass0000!", "Matheo", 22, "France",is_public=True))
 
     print("Base de test initialisée avec les utilisateurs : mat, alice, bob, matheo")
 
@@ -136,6 +211,6 @@ if __name__ == "__main__":
     go_to_search_bar()
 
     print("\n=== TEST AVEC UN UTILISATEUR CONNECTÉ ===")
-    from Login_logout_v2 import login
+    from login_logout import login
     login("mat", "Pass123!")  # devrait fonctionner maintenant
     go_to_search_bar()

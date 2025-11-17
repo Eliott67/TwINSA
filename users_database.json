@@ -5,7 +5,10 @@
         "password": "pass123",
         "name": "In\u00e9s",
         "age": 20,
-        "country": "Andorra"
+        "country": "Andorra",
+        "is_public": true,
+        "followers": [],
+        "following": []
     },
     "alex": {
         "username": "alex",
@@ -13,7 +16,10 @@
         "password": "pass321",
         "name": "Alex",
         "age": 19,
-        "country": "Miami"
+        "country": "Miami",
+        "is_public": true,
+        "followers": [],
+        "following": []
     },
     "maria": {
         "username": "maria",
@@ -21,6 +27,9 @@
         "password": "pass231",
         "name": "Mar\u00eda",
         "age": 21,
-        "country": "Spain"
+        "country": "Spain",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }

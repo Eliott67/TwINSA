@@ -1,1 +1,1 @@
-profanity-filter
+better_profanity
