@@ -27,6 +27,7 @@ class UsersDatabase:
         if os.path.exists(self.db_file):
             with open(self.db_file, 'r') as file:
                 json_file = json.load(file)
+<<<<<<< Updated upstream
             for username_item in json_file.keys():
                 username = json_file[username_item]['username']
                 email = json_file[username_item]['email']
@@ -35,6 +36,35 @@ class UsersDatabase:
                 age = json_file[username_item]['age']
                 country = json_file[username_item]['country']
                 user_new = user.User(username, email, password, name, age, country)
+=======
+
+            for username_item, data in json_file.items():
+                
+                email = data['email']
+                password = data['password']
+                name = data['name']
+                age = data['age']
+                country = data['country']
+                is_public = data.get('is_public', True)
+
+                # listes sérialisables dans le JSON (usernames)
+                followers = data.get('followers', [])
+                following = data.get('following', [])
+                blocked_users = data.get('blocked_users', [])
+                pending_requests = data.get('pending_requests', [])
+                notifications = data.get('notifications', [])
+
+                # on recrée l'objet User
+                user_new = user.User(username_item, email, password, name, age, country, is_public)
+
+                # on réinjecte les listes (listes de usernames)
+                user_new.followers = followers
+                user_new.following = following
+                user_new.blocked_users = blocked_users
+                user_new.pending_requests = pending_requests
+                user_new.notifications = notifications
+
+>>>>>>> Stashed changes
                 users_list.append(user_new)
             
         return users_list
