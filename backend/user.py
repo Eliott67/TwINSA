@@ -53,4 +53,3 @@ class User:
          # Vérifie si self suit other_user
          return other_user.username in self.following
 
-        
