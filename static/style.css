@@ -589,3 +589,124 @@ body {
     margin: 0;
     text-align: center;
 }
+/* Barre horizontale complète */
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Welcome centré : il prend tout l’espace possible */
+.welcome-centered {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+/* Conteneur des boutons à droite */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-form button {
+    border-radius: 999px;
+    border: none;
+    padding: 0.7rem 1.1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.profile-privacy {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.profile-privacy h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.profile-privacy label {
+  font-size: 0.9rem;
+}
+
+.profile-privacy {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.profile-privacy h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.profile-privacy label {
+  font-size: 0.9rem;
+}
+
+/* --- iOS STYLE TOGGLE SWITCH --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2563eb; /* Bleu identique à ton profil */
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* alignement propre */
+.toggle-row {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+

@@ -22,6 +22,18 @@
     <label>Country</label>
     <input type="text" name="country" value="{{ user.country or '' }}" placeholder="Your country">
 
+    <!-- 🔘 MINI TOGGLE SWITCH (iOS STYLE) -->
+    <div class="toggle-row">
+      <span>Private account</span>
+
+      <label class="switch">
+        <input type="checkbox" name="privacy"
+               value="private"
+               {% if not user.is_public %}checked{% endif %}>
+        <span class="slider round"></span>
+      </label>
+    </div>
+
     <button type="submit" class="btn-save">Save Changes</button>
   </form>
 

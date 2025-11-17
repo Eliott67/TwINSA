@@ -128,7 +128,6 @@ def register():
     return render_template("register.html")
 
 
-
 # --- FORGOT PASSWORD ---
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
@@ -211,7 +210,13 @@ def feed():
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
-    return render_template("feed.html", username=session["username"], tweets=visible_posts,notifications=notifications)
+    return render_template(
+        "feed.html",
+        username=session["username"],
+        tweets=visible_posts,
+        notifications=notifications
+    )
+
 
 # --- NOTIFICATIONS PAGE ---
 @app.route("/notifications")
@@ -234,7 +239,6 @@ def notifications():
     if current_user is not None and hasattr(current_user, "pending_requests"):
         pending_requests = current_user.pending_requests
 
-
     return render_template(
         "notifications.html",
         username=username,
@@ -249,7 +253,6 @@ def like(post_index):
     if "username" not in session:
         return redirect(url_for("login"))
 
-    
     posts = load_posts()
     if 0 <= post_index < len(posts):
         post = posts[post_index]
@@ -284,7 +287,6 @@ def like(post_index):
     return redirect(url_for("feed"))
 
 
-
 # --- COMMENT ON A POST ---
 @app.route("/comment/<int:post_index>", methods=["POST"])
 def comment(post_index):
@@ -313,9 +315,8 @@ def comment(post_index):
                     owner.notifications.append(
                         f"{username} commented on your post: \"{short}\""
                     )
-                    db.save_users()                    
+                    db.save_users()
     return redirect(url_for("feed"))
-
 
 
 # --- DELETE A COMMENT ---
@@ -352,13 +353,24 @@ def profile(username):
     user = db.get_user(username)  # profil à afficher
     if not user:
         flash("User not found.", "error")
-        return redirect(url_for("feed")) 
+        return redirect(url_for("feed"))
+
     can_view = user.is_public or current_user.follows(user) or user.username == current_user.username
 
+    # ✅ Mise à jour du profil SI on est sur son propre profil + POST
     if user.username == current_user.username and request.method == "POST":
         user.name = request.form.get("name", user.name)
         user.age = int(request.form.get("age", user.age or 0)) if request.form.get("age") else user.age
         user.country = request.form.get("country", user.country)
+
+        # 🔥 NEW : gestion public / private si le champ est présent dans le formulaire
+        privacy = request.form.get("privacy")  # valeurs attendues : "public" ou "private"
+        if privacy == "public":
+            user.is_public = True
+        elif privacy == "private":
+            user.is_public = False
+        # si privacy est None, on ne touche pas à is_public
+
         db.save_users()
         flash("Profile updated successfully!", "success")
 
@@ -383,6 +395,7 @@ def delete_account_route():
     else:
         flash("Incorrect password.", "error")
         return redirect(url_for("profile", username=session["username"]))
+
 
 # --- SEARCH USERS ---
 @app.route("/search", methods=["GET", "POST"])
@@ -423,6 +436,7 @@ def search_users():
         history=session.get("search_history", [])
     )
 
+
 # --- SEARCH Suggestions  ---
 @app.route("/api/search_suggestions")
 def search_suggestions():
@@ -443,6 +457,7 @@ def search_suggestions():
     matches.sort(key=lambda uname: (not current_user.follows(db.get_user(uname)), uname.lower()))
 
     return {"results": matches[:10]}
+
 
 # --- VIEW PROFILE ---
 @app.route("/view_profile/<username>")
@@ -468,6 +483,7 @@ def view_profile(username):
         can_view=can_view
     )
 
+
 # --- FOLLOW USER ---
 @app.route("/follow/<username>", methods=["POST"])
 def follow_user(username):
@@ -484,6 +500,7 @@ def follow_user(username):
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
 
+
 # --- UNFOLLOW USER ---
 @app.route("/unfollow/<username>", methods=["POST"])
 def unfollow_user(username):
@@ -499,6 +516,7 @@ def unfollow_user(username):
     else:
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
+
 
 # -- SEND FOLLOW REQUEST --
 @app.route('/send_follow_request/<username>', methods=['POST'])
@@ -523,6 +541,7 @@ def send_follow_request(username):
     flash(f"Follow request sent to {user.username}!", "success")
     return redirect(url_for('search_users'))
 
+
 # -- BLOCK USER --
 @app.route("/block/<username>", methods=["POST"])
 def block_user(username):
@@ -539,6 +558,7 @@ def block_user(username):
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
 
+
 # --- UNBLOCK USER ---
 @app.route("/unblock/<username>", methods=["POST"])
 def unblock_user(username):
@@ -554,6 +574,7 @@ def unblock_user(username):
     else:
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
+
 
 # --- VIEW FOLLOWERS ---
 @app.route("/followers/<username>")
@@ -590,6 +611,7 @@ def view_following(username):
 
     return render_template("following.html", user=user, following=following, current_user=current_user)
 
+
 # --- CLEAR SEARCH HISTORY ---
 @app.route("/clear_search_history", methods=["POST"])
 def clear_search_history():
@@ -601,6 +623,7 @@ def clear_search_history():
     session.modified = True
     flash("Search history cleared.", "success")
     return redirect(url_for("search_users"))
+
 
 # --- SUGGESTIONS ---
 @app.route("/suggestions")
@@ -625,6 +648,7 @@ def suggestions():
     suggested_users.sort(key=lambda u: len(u.followers), reverse=True)
 
     return render_template("suggestions.html", current_user=current_user, suggested_users=suggested_users)
+
 
 # --- CHANGE PASSWORD (WHEN LOGGED IN) ---
 @app.route("/change_password", methods=["GET", "POST"])
@@ -654,9 +678,11 @@ def change_password():
         user.password = new_password
         db.save_users()
         flash("Password updated successfully!", "success")
-        return redirect(url_for("profile"))
+        # ⚠️ Cette route redirige sans username, tu pourras l'ajuster plus tard si besoin
+        return redirect(url_for("profile", username=user.username))
 
     return render_template("change_password.html")
+
 
 # --- RESET PASSWORD WITH TOKEN ---
 @app.route("/reset_password", methods=["GET", "POST"])
