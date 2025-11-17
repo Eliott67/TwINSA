@@ -59,5 +59,16 @@
         "is_public": false,
         "followers": [],
         "following": []
+    },
+    "Eliott": {
+        "username": "Eliott",
+        "email": "oster@mail.fr",
+        "password": "Eliott123456789!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }

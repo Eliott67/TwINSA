@@ -626,6 +626,85 @@ def suggestions():
 
     return render_template("suggestions.html", current_user=current_user, suggested_users=suggested_users)
 
+# --- CHANGE PASSWORD (WHEN LOGGED IN) ---
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    if "username" not in session:
+        flash("Please sign in.", "error")
+        return redirect(url_for("login"))
+
+    user = db.get_user(session["username"])
+
+    if request.method == "POST":
+        old_password = request.form.get("old_password")
+        new_password = request.form.get("new_password")
+        confirm = request.form.get("confirm_password")
+
+        # Vérification ancien mdp
+        if user.get_password() != old_password:
+            flash("Incorrect current password.", "error")
+            return redirect(url_for("change_password"))
+
+        # Vérification double saisie
+        if new_password != confirm:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("change_password"))
+
+        # Update
+        user.password = new_password
+        db.save_users()
+        flash("Password updated successfully!", "success")
+        return redirect(url_for("profile"))
+
+    return render_template("change_password.html")
+
+# --- RESET PASSWORD WITH TOKEN ---
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        email = request.form.get("email").strip()
+        token = request.form.get("token").strip()
+        new_password = request.form.get("new_password")
+        confirm = request.form.get("confirm_password")
+
+        # Trouver l'utilisateur
+        user = None
+        for u in db.get_all_users():
+            if u.email == email:
+                user = u
+                break
+
+        if not user:
+            flash("Email not found.", "error")
+            return redirect(url_for("reset_password"))
+
+        # Vérifier token (il est stocké dans SecureUser.generate_reset_token())
+        su = SecureUser(
+            username=user.username,
+            email=user.email,
+            password=user.get_password(),
+            name=user.name,
+            age=user.age,
+            country=user.country
+        )
+
+        # On vérifie le token existant
+        if su.reset_token != token:
+            flash("Invalid reset token.", "error")
+            return redirect(url_for("reset_password"))
+
+        if new_password != confirm:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("reset_password"))
+
+        # Appliquer le changement
+        user.password = new_password
+        db.save_users()
+        flash("Password reset successfully!", "success")
+        return redirect(url_for("login"))
+
+    return render_template("reset_password.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
