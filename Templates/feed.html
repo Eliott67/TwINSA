@@ -91,6 +91,67 @@
       padding-left: 3rem;
     }
   }
+
+
+  .pending-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .request-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+  }
+
+  .btn-accept,
+  .btn-reject,
+  .btn-follow-back {
+    border: none;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+    white-space: nowrap;
+  }
+
+  .btn-accept {
+    background: #22c55e;
+    color: #111827;
+    box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+  }
+
+  .btn-reject {
+    background: #ef4444;
+    color: #f9fafb;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-follow-back {
+    background: #0ea5e9;
+    color: #0b1120;
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+  }
+
+  .btn-accept:hover,
+  .btn-reject:hover,
+  .btn-follow-back:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.35);
+  }
+
+  .btn-accept:active,
+  .btn-reject:active,
+  .btn-follow-back:active {
+    transform: translateY(0);
+    box-shadow: none;
+    opacity: 0.9;
+  }
+
 </style>
 
 
@@ -115,28 +176,38 @@
   </ul>
 
     <!-- Pending follow requests section -->
+    <!-- Pending follow requests section -->
   <div class="notif-sidebar-header" style="margin-top: 1rem;">
     <h3>Pending requests</h3>
-    <span class="notif-count">{{ pending_requests|length }}</span>
+    <span class="notif-count" id="pendingCount">{{ pending_requests|length }}</span>
   </div>
 
-  <ul class="notif-list">
+  <ul class="notif-list" id="pendingList">
     {% if pending_requests %}
       {% for u in pending_requests %}
-        <li class="notif-item">
-          {% if u.username is defined %}
-            <!-- if items are User objects -->
-            {{ u.username }} wants to follow you
-          {% else %}
-            <!-- if items are just usernames -->
-            {{ u }} wants to follow you
-          {% endif %}
+        {% if u.username is defined %}
+          {% set uname = u.username %}
+        {% else %}
+          {% set uname = u %}
+        {% endif %}
+        <li class="notif-item pending-item" data-username="{{ uname }}">
+          <span class="pending-text">
+            {{ uname }} wants to follow you
+          </span>
+          <div class="request-actions">
+            <button type="button" class="btn-accept">Accept</button>
+            <button type="button" class="btn-reject">Reject</button>
+            <button type="button" class="btn-follow-back" style="display:none;">
+              Follow back
+            </button>
+          </div>
         </li>
       {% endfor %}
     {% else %}
       <li class="notif-empty">No pending requests.</li>
     {% endif %}
   </ul>
+
 
 
 </aside>
@@ -236,11 +307,13 @@
   const tweetBox = document.getElementById('tweetBox');
   const charCount = document.getElementById('charCount');
 
-  tweetBox.addEventListener('input', () => {
-    const length = tweetBox.value.length;
-    charCount.textContent = `${length} / 180`;
-    charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
-  });
+  if (tweetBox && charCount) {
+    tweetBox.addEventListener('input', () => {
+      const length = tweetBox.value.length;
+      charCount.textContent = `${length} / 180`;
+      charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
+    });
+  }
 
   // --- Edit / Delete posts ---
   document.querySelectorAll('.tweet').forEach(tweetDiv => {
@@ -248,10 +321,10 @@
     const editBtn = tweetDiv.querySelector('.edit-btn');
     const deleteBtn = tweetDiv.querySelector('.delete-btn');
 
-    if(editBtn){
+    if (editBtn) {
       editBtn.addEventListener('click', () => {
         const newContent = prompt("Edit your post:", contentP.textContent);
-        if(newContent !== null && newContent.trim() !== ""){
+        if (newContent !== null && newContent.trim() !== "") {
           contentP.textContent = newContent;
           alert("Post mis à jour !");
           // TODO : connecter à ton backend Python pour sauvegarder
@@ -259,9 +332,9 @@
       });
     }
 
-    if(deleteBtn){
+    if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
-        if(confirm("Confirmez la suppression ?")){
+        if (confirm("Confirmez la suppression ?")) {
           tweetDiv.remove();
           alert("Post supprimé !");
           // TODO : connecter à ton backend Python pour supprimer le post
@@ -269,5 +342,123 @@
       });
     }
   });
+
+  // --- Pending requests: Accept / Reject / Follow back ---
+  const pendingList = document.getElementById('pendingList');
+  const pendingCountSpan = document.getElementById('pendingCount');
+
+  function refreshPendingCount() {
+    if (!pendingList || !pendingCountSpan) return;
+    const activePending = pendingList.querySelectorAll('.pending-item').length;
+    pendingCountSpan.textContent = activePending;
+  }
+
+  if (pendingList) {
+    pendingList.querySelectorAll('.pending-item').forEach(item => {
+      const username = item.dataset.username;
+      const textSpan = item.querySelector('.pending-text');
+      const acceptBtn = item.querySelector('.btn-accept');
+      const rejectBtn = item.querySelector('.btn-reject');
+      const followBackBtn = item.querySelector('.btn-follow-back');
+
+      // --- ACCEPT ---
+      if (acceptBtn) {
+        acceptBtn.addEventListener('click', () => {
+          fetch("{{ url_for('accept_request') }}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: username })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "ok") {
+              // UI only after backend success
+              textSpan.textContent = `${username} now follows you`;
+              acceptBtn.style.display = 'none';
+              if (rejectBtn) rejectBtn.style.display = 'none';
+              if (followBackBtn) followBackBtn.style.display = 'inline-flex';
+
+              // plus "pending" -> remove class + update counter
+              item.classList.remove('pending-item');
+              refreshPendingCount();
+            } else {
+              alert(data.message || "Error accepting request");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Network error while accepting request.");
+          });
+        });
+      }
+
+      // --- REJECT (front only, no backend route yet) ---
+      if (rejectBtn) {
+        rejectBtn.addEventListener('click', () => {
+          if (!confirm(`Reject ${username}'s follow request ?`)) return;
+
+          fetch("{{ url_for('reject_request') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: username })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "ok") {
+              item.remove();
+              refreshPendingCount();
+            } else {
+              alert(data.message || "Error rejecting request");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Network error while rejecting request.");
+          });
+        });
+      }
+
+
+      // --- FOLLOW BACK ---
+      if (followBackBtn) {
+        followBackBtn.addEventListener('click', () => {
+          fetch("{{ url_for('follow_back') }}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: username })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "ok") {
+              // Target is public → you now follow them
+              followBackBtn.textContent = 'Following ✓';
+            } else if (data.status === "pending") {
+              // Target is private → follow request sent
+              followBackBtn.textContent = 'Request sent ✓';
+            } else {
+              alert(data.message || "Error following back");
+              return;
+            }
+
+            followBackBtn.disabled = true;
+            followBackBtn.style.opacity = '0.8';
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Network error while following back.");
+          });
+        });
+      }
+    });
+
+    // initialise le compteur au cas où le DOM change
+    refreshPendingCount();
+  }
 </script>
+
+
 {% endblock %}

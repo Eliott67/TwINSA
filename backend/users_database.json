@@ -32,15 +32,16 @@
         "country": "France",
         "is_public": true,
         "followers": [
-            "Oscar"
+            "Oscar",
+            "David"
         ],
         "following": [
             "bob"
         ]
     },
-    "Meri": {
-        "username": "Meri",
-        "email": "meri@gmail.com",
+    "David": {
+        "username": "David",
+        "email": "david@gmail.com",
         "password": "Coucou123!",
         "name": "",
         "age": 0,
@@ -49,9 +50,9 @@
         "followers": [],
         "following": []
     },
-    "In\u00e9s": {
-        "username": "In\u00e9s",
-        "email": "ines@gmail.com",
+    "Alex": {
+        "username": "Alex",
+        "email": "alex@gmail.com",
         "password": "Coucou123!",
         "name": "",
         "age": 0,
