@@ -48,7 +48,7 @@ class UsersDatabase:
                 notifications = data.get('notifications', [])
 
                 # on recrée l'objet User
-                user_new = user.User(username, email, password, name, age, country, is_public)
+                user_new = user.User(username_item, email, password, name, age, country, is_public)
 
                 # on réinjecte les listes (listes de usernames)
                 user_new.followers = followers
