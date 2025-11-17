@@ -101,7 +101,14 @@ def register():
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
+        # New: read the toggle
+        is_public_raw = request.form.get("is_public")  # "on" if checked, None if not
+        is_public = bool(is_public_raw)  # True = public, False = private
+
         new_user = User(username, email, password, name="", age=0, country="")
+
+        # Set the visibility flag on the user object
+        new_user.is_public = is_public
 
         valid, msg = validate_registration(new_user, confirm_password)
         if not valid:
@@ -113,14 +120,12 @@ def register():
             session["username"] = new_user.username
             flash("Account created successfully!", "success")
             return redirect(url_for("suggestions"))
-
-            #flash("Account created successfully!", "success")
-            #return redirect(url_for("login"))
         except ValueError:
             flash("Username already exists.", "error")
             return redirect(url_for("register"))
 
     return render_template("register.html")
+
 
 
 # --- FORGOT PASSWORD ---
