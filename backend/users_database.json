@@ -13,6 +13,7 @@
         "password": "Twinsa123!",
         "name": "",
         "age": 0,
+<<<<<<< Updated upstream
         "country": ""
     },
     "Jules": {
@@ -22,5 +23,56 @@
         "name": "",
         "age": 0,
         "country": ""
+=======
+        "country": "",
+        "is_public": false,
+        "followers": [
+            "F\u00e9lix"
+        ],
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "lol": {
+        "username": "lol",
+        "email": "lol@gmail.com",
+        "password": "LOL@mee1",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": false,
+        "followers": [],
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "alex": {
+        "email": "alex@gmail.com",
+        "password": "pass2Alex!",
+        "name": "Alex",
+        "age": 20,
+        "country": "Belgium",
+        "is_public": true,
+        "followers": [],
+        "following": [],
+        "blocked_users": [],
+        "posts": ["Hello Twinsa!", "My second post"],
+        "notifications": []
+    },
+    "sara": {
+        "email": "sara@gmail.com",
+        "password": "pass2Sara!",
+        "name": "Sara",
+        "age": 22,
+        "country": "France",
+        "is_public": false,
+        "followers": [],
+        "following": [],
+        "blocked_users": [],
+        "posts": ["A private post"],
+        "notifications": []
+>>>>>>> Stashed changes
     }
 }
