@@ -31,151 +31,32 @@
         "age": 28,
         "country": "France",
         "is_public": true,
-        "followers": [],
+        "followers": [
+            "Oscar"
+        ],
         "following": [
             "bob"
         ]
     },
-    "Pierre": {
-        "username": "Pierre",
-        "email": "pierre@gmail.com",
-        "password": "Pierre123!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "perine": {
-        "username": "perine",
-        "email": "perine@mail.com",
-        "password": "Pass123!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "perine2": {
-        "username": "perine2",
-        "email": "perine2@mail.com",
-        "password": "Pass1234!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "perine3": {
-        "username": "perine3",
-        "email": "perine3@mail.com",
-        "password": "Pass234!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "albert": {
-        "username": "albert",
-        "email": "coucou@gmail.com",
+    "Meri": {
+        "username": "Meri",
+        "email": "meri@gmail.com",
         "password": "Coucou123!",
         "name": "",
         "age": 0,
         "country": "",
-        "is_public": true,
+        "is_public": false,
         "followers": [],
         "following": []
     },
     "In\u00e9s": {
         "username": "In\u00e9s",
-        "email": "inesbafaluy@gmail.com",
+        "email": "ines@gmail.com",
         "password": "Coucou123!",
         "name": "",
         "age": 0,
         "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "Alex": {
-        "username": "Alex",
-        "email": "alex@gmail.com",
-        "password": "Coucou123!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "lolo": {
-        "username": "lolo",
-        "email": "lolo@gmail.com",
-        "password": "Azerty12345\u00a7\u00a7",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "chadha": {
-        "username": "chadha",
-        "email": "chadha@gmail.com",
-        "password": "Azerty123\u00a7\u00a7",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "chadha2": {
-        "username": "chadha2",
-        "email": "cha@gmail.com",
-        "password": "Abcd123456789\u00a7\u00a7",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "loop": {
-        "username": "loop",
-        "email": "loop@gmail.com",
-        "password": "Loop123456789@",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "popo": {
-        "username": "popo",
-        "email": "popo@gmail.com",
-        "password": "Popo123456789@",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
-    "Oscar": {
-        "username": "Oscar",
-        "email": "oscar@gmail.com",
-        "password": "Coucou123!",
-        "name": "",
-        "age": 0,
-        "country": "",
-        "is_public": true,
+        "is_public": false,
         "followers": [],
         "following": []
     }

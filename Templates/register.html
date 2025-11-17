@@ -2,6 +2,76 @@
 {% block title %}Sign up - TwINSA{% endblock %}
 
 {% block content %}
+
+<style>
+  .privacy-toggle {
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.95rem;
+  }
+
+  .privacy-help {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* iOS-style switch */
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.2s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #4cd964; /* Apple green */
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+</style>
+
 <div class="auth-container">
   <form method="POST" class="auth-form">
     <h2>Create your account</h2>
@@ -10,6 +80,21 @@
     <input type="email" name="email" placeholder="Email address" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="password" name="confirm_password" placeholder="Confirm password" required>
+
+    
+    <!-- Privacy toggle -->
+    <div class="privacy-toggle">
+      <span>Public account</span>
+      <label class="switch">
+        <!-- checked by default = public by default -->
+        <input type="checkbox" name="is_public" checked>
+        <span class="slider round"></span>
+      </label>
+
+    </div>
+    <p class="privacy-help">
+      Turn this off if you want a private account (only approved followers can see your posts).
+    </p>
 
     <button type="submit">Sign up</button>
 
