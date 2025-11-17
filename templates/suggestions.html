@@ -4,9 +4,9 @@
 {% block content %}
 <div class="suggestions-container">
 
-  <!-- Bouton pour aller au feed -->
+  <!-- Bouton Back to Feed avec le VRAI style rond et bleu -->
   <div class="suggestions-nav" style="margin-bottom: 20px;">
-    <a href="{{ url_for('feed') }}" class="btn go-feed-btn">Go to Feed</a>
+    <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
   </div>
 
   <h2>Suggested Users to Follow 👥</h2>
@@ -19,9 +19,12 @@
             <strong>@{{ user.username }}</strong><br>
             Followers: {{ user.followers|length }}
           </div>
+
+          <!-- Follow bouton avec le VRAI style bleu -->
           <form action="{{ url_for('follow_user', username=user.username) }}" method="POST" style="margin:0;">
-            <button type="submit" class="follow-btn" style="padding: 5px 10px; border-radius: 5px; cursor: pointer;">Follow</button>
+            <button type="submit" class="btn follow-btn">Follow</button>
           </form>
+
         </div>
       {% endfor %}
     </div>

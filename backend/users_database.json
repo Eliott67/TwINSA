@@ -8,7 +8,10 @@
         "country": "Canada",
         "is_public": false,
         "followers": [],
-        "following": []
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     },
     "bob": {
         "username": "bob",
@@ -21,7 +24,10 @@
         "followers": [
             "mat"
         ],
-        "following": []
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     },
     "charlie": {
         "username": "charlie",
@@ -36,7 +42,10 @@
         ],
         "following": [
             "bob"
-        ]
+        ],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     },
     "Meri": {
         "username": "Meri",
@@ -47,7 +56,10 @@
         "country": "",
         "is_public": false,
         "followers": [],
-        "following": []
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     },
     "In\u00e9s": {
         "username": "In\u00e9s",
@@ -58,7 +70,10 @@
         "country": "",
         "is_public": false,
         "followers": [],
-        "following": []
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     },
     "Eliott": {
         "username": "Eliott",
@@ -67,8 +82,13 @@
         "name": "",
         "age": 0,
         "country": "",
-        "is_public": true,
-        "followers": [],
-        "following": []
+        "is_public": false,
+        "followers": [
+            "F\u00e9lix"
+        ],
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     }
 }
