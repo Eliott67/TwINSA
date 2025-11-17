@@ -73,7 +73,7 @@
   {% else %}
   <p>This account is private. Follow the user to see more information.</p>
   <div class="profile-actions">
-    <form action="{{ url_for('follow_user', username=user.username) }}" method="POST">
+    <form action="{{ url_for('send_follow_request', username=user.username) }}" method="POST">
       <button type="submit" class="btn">Send Follow Request</button>
     </form>
 
