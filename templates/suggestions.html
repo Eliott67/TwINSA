@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Suggestions - TwINSA{% endblock %}
+
+{% block content %}
+<div class="suggestions-container">
+
+  <!-- Bouton Back to Feed avec le VRAI style rond et bleu -->
+  <div class="suggestions-nav" style="margin-bottom: 20px;">
+    <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
+  </div>
+
+  <h2>Suggested Users to Follow 👥</h2>
+
+  {% if suggested_users %}
+    <div class="suggestions-list" style="display: flex; flex-direction: column; gap: 15px;">
+      {% for user in suggested_users %}
+        <div class="suggestion-card" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <div class="suggestion-info">
+            <strong>@{{ user.username }}</strong><br>
+            Followers: {{ user.followers|length }}
+          </div>
+
+          <!-- Follow bouton avec le VRAI style bleu -->
+          <form action="{{ url_for('follow_user', username=user.username) }}" method="POST" style="margin:0;">
+            <button type="submit" class="btn follow-btn">Follow</button>
+          </form>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No suggestions at the moment. Follow some users to see more!</p>
+  {% endif %}
+
+</div>
+{% endblock %}

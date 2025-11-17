@@ -1,3 +1,5 @@
+import notification
+
 class User:
     def __init__(self, username, email, password, name, age, country, is_public=True):
         self.username = username
@@ -9,9 +11,12 @@ class User:
         self.is_public = is_public
         self.followers = []
         self.following = []
+        self.blocked_users = []
         self.posts = []  # List of Post objects
         self.likes = {}  # dict: post_id -> number of likes
         self.total_likes = sum(self.likes.values())
+        self.notifications = []
+        self.pending_requests = []
 
     def display_info(self):
         print(f"Name: {self.name}, Email: {self.email}, Age: {self.age}, Country: {self.country}")
@@ -49,13 +54,11 @@ class User:
         if post in self.posts:
             self.posts.remove(post)
 
-    def follows(self, other_user):
+    def follows(self, other_user): #fonction de test
          # Vérifie si self suit other_user
          return other_user.username in self.following
 
-<<<<<<< Updated upstream
         
-=======
     def unfollow(self, target_user):
         if target_user.username in self.following:
             self.following.remove(target_user.username)
@@ -142,6 +145,7 @@ class User:
         else:
             print(f"{target_user.username} is not in your blocked list.")
 
+
     def view_profile(self):
         print("\n===== USER PROFILE =====")
         print(f"👤 Username: @{self.username}")
@@ -163,4 +167,3 @@ class User:
         print("========================\n")
 
     
->>>>>>> Stashed changes

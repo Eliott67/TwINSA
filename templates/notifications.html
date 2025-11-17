@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Notifications - TwINSA{% endblock %}
+
+{% block content %}
+
+<style>
+  .notifications-layout {
+    display: flex;
+    position: relative;
+    min-height: 80vh;
+  }
+
+  .notif-sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px; /* hidden by default */
+    width: 260px;
+    height: 100vh;
+    background: #111827;
+    color: #f9fafb;
+    padding: 1rem;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .notif-sidebar.open {
+    left: 0;
+  }
+
+  .notif-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .notif-sidebar-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .notif-count {
+    background: #f97316;
+    border-radius: 999px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .notif-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .notif-item {
+    padding: 0.6rem 0.4rem;
+    border-bottom: 1px solid rgba(249,250,251,0.1);
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .notif-item:last-child {
+    border-bottom: none;
+  }
+
+  .notif-empty {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    color: #9ca3af;
+  }
+
+  .notif-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100;
+    border: none;
+    background: #111827;
+    color: #f9fafb;
+    padding: 0.4rem 0.6rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
+  .notifications-main {
+    flex: 1;
+    margin-left: 1rem;
+    padding: 4rem 1rem 1rem 1rem;
+  }
+
+  .notifications-main h2 {
+    margin-top: 0;
+  }
+
+  .notif-back-link {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid #111827;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="feed-header-buttons">
+  <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
+  <a href="{{ url_for('search_users') }}" class="btn search-btn">Search</a>
+  <a href="{{ url_for('notifications') }}" class="btn notif-btn">Notifications</a>
+  <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
+</div>
+
+
+<div class="notifications-layout">
+  <!-- Slide sidebar -->
+  <aside class="notif-sidebar" id="notifSidebar">
+    <div class="notif-sidebar-header">
+      <h3>Notifications</h3>
+      <span class="notif-count">{{ notifications|length }}</span>
+    </div>
+
+    <ul class="notif-list">
+      {% if notifications %}
+        {% for n in notifications %}
+          <li class="notif-item">
+            {{ n }}
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="notif-empty">
+          No notifications yet.
+        </li>
+      {% endif %}
+    </ul>
+  </aside>
+
+  <!-- Toggle button -->
+  <button class="notif-toggle" id="notifToggle">🔔</button>
+
+  <!-- Main content -->
+  <main class="notifications-main">
+    <h2>@{{ username }}’s notifications</h2>
+    <p>Your last {{ notifications|length }} notifications appear in the left sidebar.</p>
+    <a class="notif-back-link" href="{{ url_for('feed') }}">⬅ Back to feed</a>
+  </main>
+</div>
+
+<script>
+  const sidebar = document.getElementById('notifSidebar');
+  const toggleBtn = document.getElementById('notifToggle');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+</script>
+
+{% endblock %}
