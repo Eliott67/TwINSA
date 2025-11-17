@@ -167,5 +167,16 @@
         "is_public": true,
         "followers": [],
         "following": []
+    },
+    "Oscar": {
+        "username": "Oscar",
+        "email": "oscar@gmail.com",
+        "password": "Coucou123!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": []
     }
 }

@@ -189,13 +189,23 @@ def feed():
         flash("Post created successfully!", "success")
         return redirect(url_for("feed"))
     
+    # 🔎 Filter posts: only from me or people I follow
+    visible_posts = posts
+    if current_user is not None:
+        # set of usernames whose posts I want to see
+        allowed_usernames = set(current_user.following + [username])
+        visible_posts = [
+            p for p in posts
+            if p.get("poster_username") in allowed_usernames
+        ]
+    
     # Last 20 notifications
     notifications = []
     if current_user is not None and hasattr(current_user, "notifications"):
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
-    return render_template("feed.html", username=session["username"], tweets=posts,notifications=notifications)
+    return render_template("feed.html", username=session["username"], tweets=visible_posts,notifications=notifications)
 
 # --- NOTIFICATIONS PAGE ---
 @app.route("/notifications")
