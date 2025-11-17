@@ -710,3 +710,32 @@ input:checked + .slider:before {
   align-items: center;
 }
 
+/* Bouton bleu uniforme (même style que Profile / Search / Logout) */
+.primary-btn {
+  background-color: #2563eb;
+  color: white !important;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.primary-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Follow bouton en bleu */
+.follow-btn-blue {
+  background-color: #2563eb;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.follow-btn-blue:hover {
+  background-color: #1d4ed8;
+}
