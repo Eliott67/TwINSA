@@ -4,7 +4,13 @@
         "content": "testtt",
         "date": "2025-11-14 21:36:02",
         "likes": [],
-        "comments": []
+        "comments": [
+            {
+                "username": "In\u00e9s",
+                "comment": "hi",
+                "date": "2025-11-17 08:23:47"
+            }
+        ]
     },
     {
         "poster_username": "chadha2",

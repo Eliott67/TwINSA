@@ -33,7 +33,12 @@
         {{ u.username }} {% if current_user.follows(u) %}(Followed){% endif %}
         - <a href="{{ url_for('view_profile', username=u.username) }}">View Profile</a>
         {% if not current_user.follows(u) and u.username != current_user.username %}
-        - <a href="{{ url_for('follow_user', username=u.username) }}">Follow</a>
+        - <form action="{{ url_for('follow_user', username=u.username) }}"
+            method="POST"
+            style="display:inline;">
+            <button type="submit" class="btn-link">Follow</button>
+        </form>
+
        {% endif %}
     </li>
     {% endfor %}
