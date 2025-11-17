@@ -3,7 +3,6 @@
 
 {% block content %}
 
-
 <style>
   /* --- Notifications sidebar --- */
   .notif-toggle {
@@ -38,92 +37,12 @@
   .notif-sidebar.open {
     left: 0;
   }
-
-  .notif-sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .notif-sidebar-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-  }
-
-  .notif-count {
-    background: #f97316;
-    border-radius: 999px;
-    padding: 0.1rem 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .notif-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .notif-item {
-    padding: 0.6rem 0.4rem;
-    border-bottom: 1px solid rgba(249,250,251,0.1);
-    font-size: 0.9rem;
-    line-height: 1.3;
-  }
-
-  .notif-item:last-child {
-    border-bottom: none;
-  }
-
-  .notif-empty {
-    padding: 0.4rem;
-    font-size: 0.9rem;
-    color: #9ca3af;
-  }
-
-  .feed-main-with-notifs {
-    padding-left: 3.5rem;
-  }
-
-  @media (max-width: 600px) {
-    .feed-main-with-notifs {
-      padding-left: 3rem;
-    }
-  }
-
-  /* --- Search à gauche + Welcome centré --- */
-  .feed-header-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    gap: 0.5rem;
-  }
-
-  /* Search reste à gauche naturellement */
-  .feed-header-row .search-btn-top {
-    /* tu peux rajouter du style si besoin */
-  }
-
-  /* Welcome prend tout l’espace restant et se centre */
-  .welcome-title {
-    flex: 1;
-    margin: 0;
-    text-align: center;
-  }
-
-  /* Bloc vide à droite avec même largeur approx. que le bouton Search
-     pour garder le vrai centrage */
-  .header-right-space {
-    width: 90px; /* ajuste si ton bouton est plus large/étroit */
-  }
-
 </style>
 
-
-<!-- 🔔 Bell to open the sidebar -->
+<!-- 🔔 Bell -->
 <button class="notif-toggle" id="notifToggle">🔔</button>
 
-<!-- Left sliding sidebar -->
+<!-- Sidebar -->
 <aside class="notif-sidebar" id="notifSidebar">
   <div class="notif-sidebar-header">
     <h3>Notifications</h3>
@@ -160,31 +79,24 @@
       <li class="notif-empty">No pending requests.</li>
     {% endif %}
   </ul>
-
 </aside>
 
 <div class="feed-main-with-notifs">
 
-  <!-- HEADER : Search à gauche + Welcome centré -->
+  <!-- 🔵 VERSION ORIGINALE DU HEADER, juste Search → bleu -->
   <div class="feed-header-top">
+    <h2>Welcome, {{ username }} 👋</h2>
 
-    <div class="feed-header-row">
-      <!-- Search à gauche -->
-      <a href="{{ url_for('search_users') }}" class="btn profile-btn search-btn-top">Search</a>
+    <div class="feed-header-buttons">
+      <!-- Search devient bleu : profile-btn -->
+      <a href="{{ url_for('search_users') }}" class="btn profile-btn">Search</a>
 
-      <!-- Welcome centré (grâce à flex:1 + text-align:center) -->
-      <h2 class="welcome-title">Welcome, {{ username }} 👋</h2>
-
-      <!-- Espace vide à droite pour équilibrer -->
-      <div class="header-right-space"></div>
-    </div>
-
-    <!-- boutons Profile + Logout en dessous -->
-    <div class="feed-header-buttons" style="margin-top: 10px;">
+      <!-- Profile reste bleu -->
       <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
+
+      <!-- Logout reste normal -->
       <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
     </div>
-
   </div>
 
   <div class="feed-container">
@@ -237,57 +149,32 @@
                 <button type="submit" class="comment-btn">💬</button>
               </form>
             </div>
+
           </div>
         {% endfor %}
       {% else %}
         <p>No posts yet. Be the first to post!</p>
       {% endif %}
     </div>
+
   </div>
 </div>
 
 <script>
+  // Sidebar toggle
   const notifToggle = document.getElementById('notifToggle');
   const notifSidebar = document.getElementById('notifSidebar');
 
-  if (notifToggle && notifSidebar) {
-    notifToggle.addEventListener('click', () => {
-      notifSidebar.classList.toggle('open');
-    });
-  }
+  notifToggle.addEventListener('click', () => {
+    notifSidebar.classList.toggle('open');
+  });
 
+  // Char count
   const tweetBox = document.getElementById('tweetBox');
   const charCount = document.getElementById('charCount');
 
   tweetBox.addEventListener('input', () => {
-    const length = tweetBox.value.length;
-    charCount.textContent = `${length} / 180`;
-    charCount.style.color = length > 160 ? '#ff4d4d' : '#aaa';
-  });
-
-  document.querySelectorAll('.tweet').forEach(tweetDiv => {
-    const contentP = tweetDiv.querySelector('p');
-    const editBtn = tweetDiv.querySelector('.edit-btn');
-    const deleteBtn = tweetDiv.querySelector('.delete-btn');
-
-    if (editBtn) {
-      editBtn.addEventListener('click', () => {
-        const newContent = prompt("Edit your post:", contentP.textContent);
-        if (newContent !== null && newContent.trim() !== "") {
-          contentP.textContent = newContent;
-          alert("Post mis à jour !");
-        }
-      });
-    }
-
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', () => {
-        if (confirm("Confirmez la suppression ?")) {
-          tweetDiv.remove();
-          alert("Post supprimé !");
-        }
-      });
-    }
+    charCount.textContent = tweetBox.value.length + " / 180";
   });
 </script>
 
