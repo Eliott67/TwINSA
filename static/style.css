@@ -483,3 +483,109 @@ body {
 .back-btn:hover {
   background-color: #bbb;
 }
+
+.back-btn {
+  background: #1da1f2;
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background: #0d8ddb;
+  transform: scale(1.05);
+}
+/* === CHANGE PASSWORD BUTTON === */
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+.btn-change-password {
+  background-color: #1da1f2;
+  color: white;
+  padding: 14px 32px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s ease;
+  display: inline-block;
+}
+
+.btn-change-password:hover {
+  background-color: #0d8ddb;
+  transform: scale(1.05);
+}
+.nav-btn {
+    padding: 8px 14px;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-right: 8px;
+    font-weight: 500;
+}
+
+.nav-btn-blue {
+    background-color: #007BFF;
+    color: white;
+}
+
+.nav-btn-blue:hover {
+    background-color: #0056d2;
+}
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-btn {
+    padding: 8px 14px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    background: #e7e7e7;
+    color: black;
+}
+
+.nav-btn-blue {
+    background-color: #007BFF;
+    color: white;
+}
+
+.nav-btn-blue:hover {
+    background-color: #0056d2;
+}
+
+.feed-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* centre le Welcome */
+    position: relative;
+}
+
+/* Place Search vraiment à gauche */
+.feed-header-row a {
+    position: absolute;
+    left: 0;
+}
+
+/* Espace vide à droite pour équilibrer le centrage */
+.header-right-space {
+    position: absolute;
+    right: 0;
+    width: 80px; /* même largeur que le bouton Search environ */
+}
+
+/* Welcome bien centré */
+.welcome-title {
+    margin: 0;
+    text-align: center;
+}
