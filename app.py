@@ -183,8 +183,9 @@ def feed():
             "likes": new_post.likes,
             "comments": []
         }
-
         posts.insert(0, post_data)
+        current_user.add_post(new_post)
+        db.save_users()
         save_posts(posts)
         flash("Post created successfully!", "success")
         return redirect(url_for("feed"))
@@ -213,10 +214,17 @@ def notifications():
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
+    # Pending follow requests for the logged-in user
+    pending_requests = []
+    if current_user is not None and hasattr(current_user, "pending_requests"):
+        pending_requests = current_user.pending_requests
+
+
     return render_template(
         "notifications.html",
         username=username,
-        notifications=notifications
+        notifications=notifications,
+        pending_requests=pending_requests
     )
 
 
@@ -226,19 +234,40 @@ def like(post_index):
     if "username" not in session:
         return redirect(url_for("login"))
 
+    
     posts = load_posts()
     if 0 <= post_index < len(posts):
         post = posts[post_index]
         username = session["username"]
 
-        if username in post["likes"]:
+        # Was it already liked?
+        already_liked = username in post["likes"]
+
+        if already_liked:
+            # Unlike
             post["likes"].remove(username)
         else:
+            # New like
             post["likes"].append(username)
 
-        save_posts(posts)
+            # 🔔 Notify the owner of the post (if it's not yourself)
+            owner_username = post.get("poster_username")
+            if owner_username and owner_username != username:
+                owner = db.get_user(owner_username)
+                if owner is not None and hasattr(owner, "notifications"):
+                    # Short preview of the post content
+                    preview = post.get("content", "")
+                    if len(preview) > 40:
+                        preview = preview[:40] + "…"
+                    owner.notifications.append(
+                        f"{username} liked your post: \"{preview}\""
+                    )
+                    db.save_users()  # persist notifications
 
+        save_posts(posts)
+    
     return redirect(url_for("feed"))
+
 
 
 # --- COMMENT ON A POST ---
@@ -260,7 +289,18 @@ def comment(post_index):
             posts[post_index]["comments"].append(comment)
             save_posts(posts)
 
+            # 🔔 Notify the owner of the post (if commenter != owner)
+            owner_username = posts[post_index].get("poster_username")
+            if owner_username and owner_username != username:
+                owner = db.get_user(owner_username)
+                if owner is not None and hasattr(owner, "notifications"):
+                    short = comment_text if len(comment_text) <= 40 else comment_text[:40] + "…"
+                    owner.notifications.append(
+                        f"{username} commented on your post: \"{short}\""
+                    )
+                    db.save_users()                    
     return redirect(url_for("feed"))
+
 
 
 # --- DELETE A COMMENT ---
