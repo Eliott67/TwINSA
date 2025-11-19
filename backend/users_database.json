@@ -140,7 +140,7 @@
         "name": "",
         "age": 22,
         "country": "Brasil",
-        "is_public": true,
+        "is_public": false,
         "followers": [
             "toto",
             "noa_le_caca",
