@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile - TwINSA{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+
+  <div class="profile-header">
+    <h2>Edit Your Profile</h2>
+    <a href="{{ url_for('profile', username=user.username) }}" class="btn back-btn">← Back to Profile</a>
+  </div>
+
+  <!-- FORMULAIRE DE MODIFICATION -->
+  <form method="POST" class="profile-form">
+    <label>Name</label>
+    <input type="text" name="name" value="{{ user.name or '' }}" placeholder="Your name">
+
+    <label>Age</label>
+    <input type="number" name="age" value="{{ user.age or '' }}" placeholder="Your age">
+
+    <label>Country</label>
+    <input type="text" name="country" value="{{ user.country or '' }}" placeholder="Your country">
+
+    <!-- 🔘 Toggle public/private -->
+    <div class="toggle-row">
+      <span>Private account</span>
+      <label class="switch">
+        <input type="checkbox" name="privacy"
+               value="private"
+               {% if not user.is_public %}checked{% endif %}>
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <button type="submit" class="btn-save">Save Changes</button>
+  </form>
+
+  <!-- CHANGE PASSWORD BUTTON -->
+  <div class="center-button">
+    <a href="{{ url_for('change_password') }}" class="btn-change-password">Change Password</a>
+  </div>
+
+  <hr>
+
+  <!-- DELETE ACCOUNT -->
+  <form action="{{ url_for('delete_account_route') }}" method="POST" class="delete-form">
+    <h3>Delete Account</h3>
+    <p>This action is irreversible.</p>
+    <input type="password" name="password" placeholder="Confirm your password" required>
+    <button type="submit" class="btn-delete">Delete My Account</button>
+  </form>
+
+</div>
+{% endblock %}

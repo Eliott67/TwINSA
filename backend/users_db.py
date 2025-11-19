@@ -2,7 +2,7 @@
 
 import json
 import os
-import user  # module user.py qui contient la classe User
+from backend.user import *  # module user.py qui contient la classe User
 
 
 class UsersDatabase:
@@ -31,7 +31,7 @@ class UsersDatabase:
         if os.path.exists(self.db_file):
             with open(self.db_file, 'r', encoding="utf-8") as file:
                 json_file = json.load(file)
-            for username_item in json_file.keys():
+            for username_item, data in json_file.items():
                 
                 email = json_file[username_item]['email']
                 password = json_file[username_item]['password']
@@ -48,7 +48,7 @@ class UsersDatabase:
                 notifications = data.get('notifications', [])
 
                 # on recrée l'objet User
-                user_new = user.User(username_item, email, password, name, age, country, is_public)
+                user_new = User(username_item, email, password, name, age, country, is_public)
 
                 # on réinjecte les listes (listes de usernames)
                 user_new.followers = followers
@@ -75,19 +75,19 @@ class UsersDatabase:
             # followers / following / blocked_users / pending_requests
             # peuvent contenir soit des User, soit déjà des usernames (str)
             followers = [
-                f.username if isinstance(f, user.User) else f
+                f.username if isinstance(f, User) else f
                 for f in getattr(u, "followers", [])
             ]
             following = [
-                f.username if isinstance(f, user.User) else f
+                f.username if isinstance(f, User) else f
                 for f in getattr(u, "following", [])
             ]
             blocked_users = [
-                b.username if isinstance(b, user.User) else b
+                b.username if isinstance(b, User) else b
                 for b in getattr(u, "blocked_users", [])
             ]
             pending_requests = [
-                p.username if isinstance(p, user.User) else p
+                p.username if isinstance(p, User) else p
                 for p in getattr(u, "pending_requests", [])
             ]
 

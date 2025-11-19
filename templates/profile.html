@@ -4,55 +4,72 @@
 {% block content %}
 <div class="profile-container">
 
-  {% if current_user.username == user.username %}
+{% if current_user.username == user.username %}
   <!-- === PROFILE OWNER VIEW === -->
   <div class="profile-header">
     <h2>Your Profile</h2>
     <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
   </div>
 
-  <!-- EDIT PERSONAL INFO -->
-  <form method="POST" class="profile-form">
-    <label>Name</label>
-    <input type="text" name="name" value="{{ user.name or '' }}" placeholder="Your name">
-
-    <label>Age</label>
-    <input type="number" name="age" value="{{ user.age or '' }}" placeholder="Your age">
-
-    <label>Country</label>
-    <input type="text" name="country" value="{{ user.country or '' }}" placeholder="Your country">
-
-    <!-- 🔘 MINI TOGGLE SWITCH (iOS STYLE) -->
-    <div class="toggle-row">
-      <span>Private account</span>
-
-      <label class="switch">
-        <input type="checkbox" name="privacy"
-               value="private"
-               {% if not user.is_public %}checked{% endif %}>
-        <span class="slider round"></span>
-      </label>
-    </div>
-
-    <button type="submit" class="btn-save">Save Changes</button>
-  </form>
-
-  <!-- CHANGE PASSWORD BUTTON -->
-  <div class="center-button">
-    <a href="{{ url_for('change_password') }}" class="btn-change-password">Change Password</a>
+  <!-- USER INFO -->
+  <div class="profile-info">
+    <p>👤 <strong>Username:</strong> @{{ user.username }}</p>
+    <p>📛 <strong>Name:</strong> {{ user.name }}</p>
+    <p>🎂 <strong>Age:</strong> {{ user.age }}</p>
+    <p>🌍 <strong>Country:</strong> {{ user.country }}</p>
+    <p>🔒 <strong>Public profile:</strong> {{ 'Yes' if user.is_public else 'No' }}</p>
   </div>
 
-  <hr>
+  <div class="follow-counts">
+        <a href="{{ url_for('view_followers', username=user.username) }}" class="follow-link">
+            👥 Followers: <strong>{{ user.followers|length }}</strong>
+        </a>
 
-  <!-- DELETE ACCOUNT -->
-  <form action="{{ url_for('delete_account_route') }}" method="POST" class="delete-form">
-    <h3>Delete Account</h3>
-    <p>This action is irreversible.</p>
-    <input type="password" name="password" placeholder="Confirm your password" required>
-    <button type="submit" class="btn-delete">Delete My Account</button>
-  </form>
+        <a href="{{ url_for('view_following', username=user.username) }}" class="follow-link">
+            ➡️ Following: <strong>{{ user.following|length }}</strong>
+        </a>
+  </div>
 
-  {% else %}
+  <!-- POSTS -->
+  <div class="profile-posts">
+    <h3>--- Posts ---</h3>
+
+    {% if not visible %}
+      <p>No posts yet.</p>
+    {% else %}
+      <ul>
+        {% for post in visible %}
+          <li class="post-item">
+              <div class="post-header">
+                  <strong>@{{ post.poster_username }}</strong>
+                  <span class="post-date">{{ post.date.strftime('%Y-%m-%d %H:%M') }}</span>
+              </div>
+
+              <div class="post-content">
+                  {{ post.content }}
+              </div>
+
+              <div class="post-stats">
+                  ❤️ {{ post.likes|length }} • 💬 {{ post.comments|length }}
+              </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+    
+
+  <!-- BOUTON MODIFIER MON PROFIL -->
+    <!-- Bouton Modifier mon profil -->
+    <div class="center-button">
+      <a href="{{ url_for('edit_profile2', username=user.username) }}" class="btn-edit-profile">
+        ✏️ Edit profile
+      </a>
+    </div> 
+
+
+
+{% else %}
   <!-- === VIEWING ANOTHER USER'S PROFILE === -->
   <div class="profile-header">
     <h2>{{ user.username }}'s Profile</h2>
@@ -60,12 +77,54 @@
   </div>
 
   {% if can_view %}
-    <p><strong>Name:</strong> {{ user.name }}</p>
-    <p><strong>Age:</strong> {{ user.age }}</p>
-    <p><strong>Country:</strong> {{ user.country }}</p>
-    <p><strong>Account Type:</strong> {{ 'Public' if user.is_public else 'Private' }}</p>
+      <div class="profile-info">
+        <p>👤 <strong>Username:</strong> @{{ user.username }}</p>
+        <p>📛 <strong>Name:</strong> {{ user.name }}</p>
+        <p>🎂 <strong>Age:</strong> {{ user.age }}</p>
+        <p>🌍 <strong>Country:</strong> {{ user.country }}</p>
+        <p>🔒 <strong>Public profile:</strong> {{ 'Yes' if user.is_public else 'No' }}</p>
+      </div>
 
-    <div class="profile-actions">
+      <div class="follow-counts">
+          <a href="{{ url_for('view_followers', username=user.username) }}" class="follow-link">
+              👥 Followers: <strong>{{ user.followers|length }}</strong>
+          </a>
+
+          <a href="{{ url_for('view_following', username=user.username) }}" class="follow-link">
+              ➡️ Following: <strong>{{ user.following|length }}</strong>
+          </a>
+      </div>
+
+      <!-- POSTS -->
+      
+      <div class="profile-posts">
+    <h3>--- Posts ---</h3>
+
+        {% if visible|length == 0 %}
+          <p>No posts yet.</p>
+        {% else %}
+          <ul>
+            {% for post in visible %}
+              <li class="post-item">
+                  <div class="post-header">
+                      <strong>@{{ post.poster_username }}</strong>
+                      <span class="post-date">{{ post.date.strftime('%Y-%m-%d %H:%M') }}</span>
+                  </div>
+
+                  <div class="post-content">
+                      {{ post.content }}
+                  </div>
+
+                  <div class="post-stats">
+                      ❤️ {{ post.likes|length }} • 💬 {{ post.comments|length }}
+                  </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div class="profile-actions">
       {% if current_user.follows(user) %}
         <form action="{{ url_for('unfollow_user', username=user.username) }}" method="POST">
           <button type="submit" class="btn">Unfollow</button>
@@ -76,28 +135,16 @@
         </form>
       {% endif %}
 
-      {% if current_user.blocks(user) %}
-        <form action="{{ url_for('unblock_user', username=user.username) }}" method="POST">
-          <button type="submit" class="btn">Unblock</button>
-        </form>
-      {% else %}
-        <form action="{{ url_for('block_user', username=user.username) }}" method="POST">
-          <button type="submit" class="btn">Block</button>
-        </form>
-      {% endif %}
-    </div>
-
-    <div class="followers-following">
-      <a href="{{ url_for('view_followers', username=user.username) }}">View Followers</a> |
-      <a href="{{ url_for('view_following', username=user.username) }}">View Following</a>
-    </div>
-
-  {% else %}
-    <p>This account is private. Follow the user to see more information.</p>
+    {% else %}
+      
+      <p>This account is private. Follow the user to see more information.</p>
     <div class="profile-actions">
       <form action="{{ url_for('send_follow_request', username=user.username) }}" method="POST">
         <button type="submit" class="btn">Send Follow Request</button>
       </form>
+      <p>🚫 This profile is private. Posts are hidden.</p>
+
+    {% endif %}
 
       {% if current_user.blocks(user) %}
         <form action="{{ url_for('unblock_user', username=user.username) }}" method="POST">
@@ -109,7 +156,6 @@
         </form>
       {% endif %}
     </div>
-  {% endif %}
   {% endif %}
 
 </div>
