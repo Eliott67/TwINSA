@@ -393,7 +393,7 @@ def profile(username):
     following = [db.get_user(u) for u in user.following ]
     following = [f for f in following if f is not None]
 
-    visible = user.posts
+    visible = []
     
     # Charger les posts SEULEMENT si autorisé
     if can_view:
@@ -542,7 +542,7 @@ def view_profile(username):
 
     # Vérifier la visibilité du profil
     can_view = user.is_public or current_user.follows(user)
-
+    visible= list()
     if can_view:
         posts = load_posts_bis(db)
         visible = [p for p in posts if p.poster_username == username]
