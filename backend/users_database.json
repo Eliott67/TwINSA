@@ -142,16 +142,22 @@
         "country": "Brasil",
         "is_public": true,
         "followers": [
-            "toto"
+            "toto",
+            "noa_le_caca",
+            "eliott_le_dragon"
         ],
         "following": [
-            "toto"
+            "toto",
+            "noa_le_caca",
+            "eliott_le_dragon"
         ],
         "blocked_users": [],
         "pending_requests": [],
         "notifications": [
             "toto is now following you.",
-            "toto commented on your post: \"cest cool\""
+            "toto commented on your post: \"cest cool\"",
+            "noa_le_caca is now following you.",
+            "eliott_le_dragon is now following you."
         ]
     },
     "toto": {
@@ -163,11 +169,86 @@
         "country": "V\u00e9ronique",
         "is_public": true,
         "followers": [
+            "leo_le_bg",
+            "noa_le_caca",
+            "eliott_le_dragon"
+        ],
+        "following": [
+            "leo_le_bg",
+            "noa_le_caca",
+            "eliott_le_dragon"
+        ],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": [
+            "noa_le_caca is now following you.",
+            "eliott_le_dragon is now following you."
+        ]
+    },
+    "noa_le_caca": {
+        "username": "noa_le_caca",
+        "email": "noa@gmail.com",
+        "password": "Caca@123",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [
+            "toto",
             "leo_le_bg"
         ],
         "following": [
+            "toto",
             "leo_le_bg"
         ],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "eliott_le_dragon": {
+        "username": "eliott_le_dragon",
+        "email": "eliott@gmail.com",
+        "password": "Eliott@123",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [
+            "leo_le_bg",
+            "toto"
+        ],
+        "following": [
+            "leo_le_bg",
+            "toto"
+        ],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "leo_bis": {
+        "username": "leo_bis",
+        "email": "bis@gmail.com",
+        "password": "Bis@1234",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "test_final": {
+        "username": "test_final",
+        "email": "ui@gmail.com",
+        "password": "Test@123",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": [],
         "blocked_users": [],
         "pending_requests": [],
         "notifications": []

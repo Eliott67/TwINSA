@@ -388,6 +388,10 @@ def profile(username):
         or current_user.follows(user)
         or user.username == current_user.username
     )
+    followers = [db.get_user(u) for u in user.followers ]
+    followers = [f for f in followers if f is not None]
+    following = [db.get_user(u) for u in user.following ]
+    following = [f for f in following if f is not None]
 
     visible = user.posts
     
@@ -395,15 +399,16 @@ def profile(username):
     if can_view:
         posts = load_posts_bis(db)
         visible = [p for p in posts if p.poster_username == username]
-
-    print("VISIBLE:", visible, "CAN_VIEW:", can_view)
-
+    print(followers)
+    print(following)
     return render_template(
         "profile.html",
         user=user,
         current_user=current_user,
         can_view=can_view,
-        visible=visible
+        visible=visible,
+        followers = followers,
+        following=following
     )
 
 
@@ -542,13 +547,18 @@ def view_profile(username):
         posts = load_posts_bis(db)
         visible = [p for p in posts if p.poster_username == username]
 
+    followers = [db.get_user(u) for u in user.followers if u is not None]
+    followers = [f for f in followers if f is not None]
+    following = [db.get_user(u) for u in user.following if u is not None]
+    following = [f for f in following if f is not None]
+
+
     return render_template(
         "profile.html",
         user=user,
         current_user=current_user,
         can_view=can_view,
-        visible=visible
-    )
+        visible=visible, followers = followers, following = following)
 
 
 # --- FOLLOW USER ---
@@ -653,8 +663,12 @@ def view_followers(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
+    
+    followers = []
+    followers = [db.get_user(u) for u in user.followers if u is not None]
+    followers = [f for f in followers if f is not None]
 
-    followers = [db.get_user(u) for u in user.followers] # liste d'objets User qui suivent cet utilisateur
+    #print(followers) # liste d'objets User qui suivent cet utilisateur
     current_user = db.get_user(session["username"])
 
     return render_template("followers.html", user=user, followers=followers, current_user=current_user)
@@ -672,8 +686,11 @@ def view_following(username):
         flash("User not found.", "error")
         return redirect(url_for("feed"))
 
-    
-    following = [db.get_user(u) for u in user.following]  # liste d'objets User que cet utilisateur suit
+    following = []
+    following = [db.get_user(u) for u in user.following if u is not None]
+    following = [f for f in following if f is not None]
+
+    #print(following)  # liste d'objets User que cet utilisateur suit
     current_user = db.get_user(session["username"])
 
     return render_template("following.html", user=user, following=following, current_user=current_user)

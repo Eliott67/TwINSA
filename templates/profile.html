@@ -22,11 +22,11 @@
 
   <div class="follow-counts">
         <a href="{{ url_for('view_followers', username=user.username) }}" class="follow-link">
-            👥 Followers: <strong>{{ user.followers|length }}</strong>
+            👥 Followers: <strong>{{ followers|length }}</strong>
         </a>
 
         <a href="{{ url_for('view_following', username=user.username) }}" class="follow-link">
-            ➡️ Following: <strong>{{ user.following|length }}</strong>
+            ➡️ Following: <strong>{{ following|length }}</strong>
         </a>
   </div>
 
@@ -87,11 +87,11 @@
 
       <div class="follow-counts">
           <a href="{{ url_for('view_followers', username=user.username) }}" class="follow-link">
-              👥 Followers: <strong>{{ user.followers|length }}</strong>
+              👥 Followers: <strong>{{ followers|length }}</strong>
           </a>
 
           <a href="{{ url_for('view_following', username=user.username) }}" class="follow-link">
-              ➡️ Following: <strong>{{ user.following|length }}</strong>
+              ➡️ Following: <strong>{{ following|length }}</strong>
           </a>
       </div>
 
