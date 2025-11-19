@@ -9,6 +9,7 @@
     {% if following %}
         <ul class="follow-list">
             {% for follow in following %}
+              {% if follow is not none %}  
                 <li class="follow-item">
                     <div class="follow-user-info">
                         <div class="follow-avatar">👤</div>
@@ -22,6 +23,7 @@
                         View profile →
                     </a>
                 </li>
+              {% endif %}
             {% endfor %}
         </ul>
     {% else %}
