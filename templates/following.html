@@ -1,22 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Following - {{ user.username }}{% endblock %}
+{% block title %}Following - TwINSA{% endblock %}
 
 {% block content %}
-<div class="following-container">
-  <h2>{{ user.username }} is Following</h2>
+<div class="follow-container">
+    <h2>➡️ Following</h2>
+    <a href="{{ url_for('profile', username=user.username) }}" class="btn back-btn">← Back to Profile</a>
 
-  {% if following %}
-    <ul>
-      {% for u in following %}
-        <li>
-          <a href="{{ url_for('view_profile', username=u.username) }}">{{ u.username }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>{{ user.username }} is not following anyone yet.</p>
-  {% endif %}
+    {% if following %}
+        <ul class="follow-list">
+            {% for follow in following %}
+                <li class="follow-item">
+                    <div class="follow-user-info">
+                        <div class="follow-avatar">👤</div>
+                        <div>
+                            <strong>@{{ follow.username }}</strong><br>
+                            <span class="follow-name">{{ follow.name }}</span>
+                        </div>
+                    </div>
 
-  <a href="{{ url_for('profile', username=user.username) }}" class="btn back-btn">← Back to Profile</a>
+                    <a href="{{ url_for('profile', username=follow.username) }}" class="btn see-profile-btn">
+                        View profile →
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-msg">Not following anyone yet.</p>
+    {% endif %}
 </div>
 {% endblock %}
+

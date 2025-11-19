@@ -1,4 +1,4 @@
-import notification
+from .notification import *
 
 class User:
     def __init__(self, username, email, password, name, age, country, is_public=True):
@@ -96,13 +96,13 @@ class User:
             target_user.add_follower(self.username)
 
             # Notification
-            notif = notification.NewFollowerNotification(sender=self, receiver=target_user)
+            notif = NewFollowerNotification(sender=self, receiver=target_user)
             notif.send()
 
             print(f"You are now following {target_user.username}.")
         else:
             # Follow request
-            request = notification.FollowRequestNotification(sender=self, receiver=target_user)
+            request = FollowRequestNotification(sender=self, receiver=target_user)
             request.send_request()
             print(f"Follow request sent to {target_user.username}.")
 

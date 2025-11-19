@@ -90,7 +90,6 @@
         "blocked_users": [],
         "pending_requests": [],
         "notifications": []
-
     },
     "lol": {
         "username": "lol",
@@ -107,6 +106,7 @@
         "notifications": []
     },
     "alex": {
+        "username": "alex",
         "email": "alex@gmail.com",
         "password": "pass2Alex!",
         "name": "Alex",
@@ -116,10 +116,11 @@
         "followers": [],
         "following": [],
         "blocked_users": [],
-        "posts": ["Hello Twinsa!", "My second post"],
+        "pending_requests": [],
         "notifications": []
     },
     "sara": {
+        "username": "sara",
         "email": "sara@gmail.com",
         "password": "pass2Sara!",
         "name": "Sara",
@@ -129,7 +130,46 @@
         "followers": [],
         "following": [],
         "blocked_users": [],
-        "posts": ["A private post"],
+        "pending_requests": [],
+        "notifications": []
+    },
+    "leo_le_bg": {
+        "username": "leo_le_bg",
+        "email": "zozo@gmail.com",
+        "password": "Zozo@me1",
+        "name": "",
+        "age": 22,
+        "country": "Brasil",
+        "is_public": true,
+        "followers": [
+            "toto"
+        ],
+        "following": [
+            "toto"
+        ],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": [
+            "toto is now following you.",
+            "toto commented on your post: \"cest cool\""
+        ]
+    },
+    "toto": {
+        "username": "toto",
+        "email": "toto@gmail.com",
+        "password": "Toto@123",
+        "name": "toto_le_zozo",
+        "age": 69,
+        "country": "V\u00e9ronique",
+        "is_public": true,
+        "followers": [
+            "leo_le_bg"
+        ],
+        "following": [
+            "leo_le_bg"
+        ],
+        "blocked_users": [],
+        "pending_requests": [],
         "notifications": []
     }
 }
