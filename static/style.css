@@ -291,6 +291,99 @@ body {
   gap: 10px;
 }
 
+
+/* POSTS SECTION */
+.profile-posts {
+    margin-top: 25px;
+}
+
+.profile-posts h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Individual post */
+.post-item {
+    list-style: none;
+    background: white;              /* FOND TRÈS LISIBLE */
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Header of post */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.post-header strong {
+    color: #111;
+}
+
+/* CONTENT OF POST */
+.post-content {
+    font-size: 16px;
+    color: #222;                /* TEXTE LISIBLE !!! */
+    margin-bottom: 10px;
+}
+
+/* Stats (likes, comments) */
+.post-stats {
+    font-size: 14px;
+    color: #666;
+}
+
+.follow-counts {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.follow-counts a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+
+    /* Couleur claire + lisible */
+    color: #f8f9fa;
+
+    background: #444;              /* fond sombre pour contraste */
+    padding: 6px 14px;
+    border-radius: 8px;
+
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.follow-counts a:hover {
+    background: #666;
+    color: white;
+}
+
+
+.follow-link {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+    transition: 0.2s ease;
+}
+
+.follow-link strong {
+    color: #222;
+}
+
+.follow-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+
 /* === PROFILE PAGE === */
 .profile-container {
   max-width: 500px;
@@ -423,7 +516,75 @@ body {
   background-color: #0d0d0d;
   color: #fff;
   margin-top: 5px;
+} 
+
+/* === FOLLOWERS / FOLLOWING PAGE === */
+.follow-container {
+    background: #1e1e1e;
+    color: #f5f5f5;
+    padding: 30px;
+    border-radius: 12px;
+    width: 70%;
+    margin: 30px auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
 }
+
+.follow-container h2 {
+    color: #ffffff;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 26px;
+}
+
+.empty-follow {
+    text-align: center;
+    color: #cccccc;
+    font-style: italic;
+}
+
+.follow-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.follow-item {
+    background: #2a2a2a;
+    color: #fff;
+    padding: 15px 20px;
+    margin: 12px 0;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    transition: 0.2s;
+}
+
+.follow-item:hover {
+    background: #333;
+    transform: scale(1.02);
+}
+
+.follow-username {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.btn-profile {
+    padding: 8px 14px;
+    background: #4a90e2;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn-profile:hover {
+    background: #6bb1ff;
+}
+
 
 .btn-save {
   background-color: #1da1f2;
@@ -467,6 +628,7 @@ body {
 
 .btn-delete:hover {
   background-color: #cc0000;
+
 }
 /* === Bouton "Back" pour la recherche et les autres pages === */
 .back-btn {
@@ -738,4 +900,92 @@ input:checked + .slider:before {
 
 .follow-btn-blue:hover {
   background-color: #1d4ed8;
+}
+
+.btn-edit-profile {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #1DA1F2; /* bleu Twitter */
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-edit-profile:hover {
+    background: #0d8bd9;
+    transform: scale(1.05);
+}
+
+.edit-profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    background: black;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.profile-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.profile-form input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #1DA1F2;
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-save:hover {
+    background: black;
+    transform: scale(1.03);
+}
+
+.post-item {
+    background: #f6f6f6;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    list-style: none;
+}
+
+.post-header {
+    font-size: 14px;
+    color: black;
+    margin-bottom: 5px;
+}
+
+.post-date {
+    font-size: 12px;
+    color: black;
+    margin-left: 6px;
+}
+
+.post-content {
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+.post-stats {
+    font-size: 12px;
+    color: black;
 }

@@ -1,7 +1,9 @@
 import datetime
-from user import User
-from users_db import UsersDatabase
-from notification import LikeNotification, CommentNotification
+import os
+import json
+from .user import User
+from .users_db import UsersDatabase
+from .notification import LikeNotification, CommentNotification
 
 class Post:
     def __init__(self, content, poster_username, database):
@@ -13,16 +15,21 @@ class Post:
         self.likes = []
         self.comments = []
         self.id_comment = 0
-        self.post_id = len(self.user.posts) + 1
+        if self.user is not None:
+            self.post_id = len(self.user.posts) + 1
+        else:
+            self.post_id = 0  # déjà fourni
+
         self.update_poster_list_posts()
 
     def update_poster_list_posts(self):
         """Met à jour la liste des posts de l’utilisateur."""
-        if self not in self.user.posts:
-            self.user.add_post(self)
-        else:
-            self.user.delete_post(self)
-            self.user.add_post(self)
+        if self.user != None :
+            if self not in self.user.posts:
+                self.user.add_post(self)
+            else:
+                self.user.delete_post(self)
+                self.user.add_post(self)
 
     # --- Likes ---
     def update_likes(self):
@@ -91,3 +98,4 @@ class Post:
                 print(f"  [{c['id']}] {c['username']} ({c['date']}): {c['comment']}")
         else:
             print("No comments yet.")
+
