@@ -1,4 +1,4 @@
-import notification
+from .notification import *
 
 class User:
     def __init__(self, username, email, password, name, age, country, is_public=True):
@@ -58,6 +58,7 @@ class User:
          # Vérifie si self suit other_user
          return other_user.username in self.following
 
+        
     def unfollow(self, target_user):
         if target_user.username in self.following:
             self.following.remove(target_user.username)
@@ -95,13 +96,13 @@ class User:
             target_user.add_follower(self.username)
 
             # Notification
-            notif = notification.NewFollowerNotification(sender=self, receiver=target_user)
+            notif = NewFollowerNotification(sender=self, receiver=target_user)
             notif.send()
 
             print(f"You are now following {target_user.username}.")
         else:
             # Follow request
-            request = notification.FollowRequestNotification(sender=self, receiver=target_user)
+            request = FollowRequestNotification(sender=self, receiver=target_user)
             request.send_request()
             print(f"Follow request sent to {target_user.username}.")
 
@@ -143,3 +144,26 @@ class User:
             print(f"You have unblocked {target_user.username}.")
         else:
             print(f"{target_user.username} is not in your blocked list.")
+
+
+    def view_profile(self):
+        print("\n===== USER PROFILE =====")
+        print(f"👤 Username: @{self.username}")
+        print(f"📛 Name: {self.name}")
+        print(f"🎂 Age: {self.age}")
+        print(f"🌍 Country: {self.country}")
+        print(f"🔒 Public profile: {self.is_public}")
+
+        print("\n--- Posts ---")
+        if not self.is_public:
+            print("🚫 This profile is private. Posts are hidden.")
+        else:
+            if not self.posts:
+                print("No posts yet.")
+            else:
+                for i, post in enumerate(self.posts, 1):
+                    print(f"{i}. {post}")
+
+        print("========================\n")
+
+    

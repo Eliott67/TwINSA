@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import datetime
+from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 # --- Make backend importable ---
@@ -27,6 +28,32 @@ db = UsersDatabase("backend/users_database.json")
 
 # --- Posts file ---
 POSTS_FILE = "posts.json"
+
+def load_posts_bis(db):
+    raw_posts = load_posts()
+    posts = []
+
+    for p in raw_posts:
+        # On crée un Post SANS exécuter __init__
+        post = Post.__new__(Post)
+
+        post.poster_username = p["poster_username"]
+        post.database = db
+        post.user = db.get_user(post.poster_username)
+        post.content = p["content"]
+
+        # convertir la date
+        post.date = datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S")
+
+        post.likes = p["likes"]
+        post.comments = p["comments"]
+
+        # On RECONSTRUIT l'ID du post
+        post.post_id = p.get("post_id", 0)
+
+        posts.append(post)
+
+    return posts
 
 
 # === Helper functions ===
@@ -341,8 +368,6 @@ def delete_comment(post_index, comment_index):
 
     return redirect(url_for("feed"))
 
-
-# --- PROFILE PAGE ---
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
     if "username" not in session:
@@ -351,30 +376,72 @@ def profile(username):
 
     current_user = db.get_user(session["username"])  # connecté
     user = db.get_user(username)  # profil à afficher
+    db.get_user(session["username"])
+
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
 
-    can_view = user.is_public or current_user.follows(user) or user.username == current_user.username
+    # ÉVALUER LES DROITS AVANT DE MONTRER LES POSTS
+    can_view = (
+        user.is_public 
+        or current_user.follows(user)
+        or user.username == current_user.username
+    )
+    followers = [db.get_user(u) for u in user.followers ]
+    followers = [f for f in followers if f is not None]
+    following = [db.get_user(u) for u in user.following ]
+    following = [f for f in following if f is not None]
 
-    # ✅ Mise à jour du profil SI on est sur son propre profil + POST
-    if user.username == current_user.username and request.method == "POST":
+    visible = []
+    
+    # Charger les posts SEULEMENT si autorisé
+    if can_view:
+        posts = load_posts_bis(db)
+        visible = [p for p in posts if p.poster_username == username]
+    print(followers)
+    print(following)
+    return render_template(
+        "profile.html",
+        user=user,
+        current_user=current_user,
+        can_view=can_view,
+        visible=visible,
+        followers = followers,
+        following=following
+    )
+
+
+
+@app.route("/edit_profile/<username>/edit", methods=["GET", "POST"])
+def edit_profile2(username):
+    if "username" not in session:
+        flash("Please sign in to edit your profile.", "error")
+        return redirect(url_for("login"))
+
+    current_user = db.get_user(session["username"])
+    user = db.get_user(username)
+
+    if not user or user.username != current_user.username:
+        flash("You can only edit your own profile.", "error")
+        return redirect(url_for("profile", username=username))
+
+    if request.method == "POST":
         user.name = request.form.get("name", user.name)
         user.age = int(request.form.get("age", user.age or 0)) if request.form.get("age") else user.age
         user.country = request.form.get("country", user.country)
 
-        # 🔥 NEW : gestion public / private si le champ est présent dans le formulaire
-        privacy = request.form.get("privacy")  # valeurs attendues : "public" ou "private"
-        if privacy == "public":
-            user.is_public = True
-        elif privacy == "private":
+        privacy = request.form.get("privacy")
+        if privacy == "private":
             user.is_public = False
-        # si privacy est None, on ne touche pas à is_public
+        else:
+            user.is_public = True
 
         db.save_users()
         flash("Profile updated successfully!", "success")
+        return redirect(url_for("profile", username=user.username))
 
-    return render_template("profile.html", user=user, current_user=current_user, can_view=can_view)
+    return render_template("edit_profile2.html", user=user, current_user=current_user)
 
 
 # --- DELETE ACCOUNT ---
@@ -475,13 +542,23 @@ def view_profile(username):
 
     # Vérifier la visibilité du profil
     can_view = user.is_public or current_user.follows(user)
+    visible= list()
+    if can_view:
+        posts = load_posts_bis(db)
+        visible = [p for p in posts if p.poster_username == username]
+
+    followers = [db.get_user(u) for u in user.followers if u is not None]
+    followers = [f for f in followers if f is not None]
+    following = [db.get_user(u) for u in user.following if u is not None]
+    following = [f for f in following if f is not None]
+
 
     return render_template(
         "profile.html",
         user=user,
         current_user=current_user,
-        can_view=can_view
-    )
+        can_view=can_view,
+        visible=visible, followers = followers, following = following)
 
 
 # --- FOLLOW USER ---
@@ -575,7 +652,6 @@ def unblock_user(username):
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
 
-
 # --- VIEW FOLLOWERS ---
 @app.route("/followers/<username>")
 def view_followers(username):
@@ -587,12 +663,15 @@ def view_followers(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
+    
+    followers = []
+    followers = [db.get_user(u) for u in user.followers if u is not None]
+    followers = [f for f in followers if f is not None]
 
-    followers = user.followers  # liste d'objets User qui suivent cet utilisateur
+    #print(followers) # liste d'objets User qui suivent cet utilisateur
     current_user = db.get_user(session["username"])
 
     return render_template("followers.html", user=user, followers=followers, current_user=current_user)
-
 
 # --- VIEW FOLLOWING ---
 @app.route("/following/<username>")
@@ -602,11 +681,16 @@ def view_following(username):
         return redirect(url_for("login"))
 
     user = db.get_user(username)
+
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
 
-    following = user.following  # liste d'objets User que cet utilisateur suit
+    following = []
+    following = [db.get_user(u) for u in user.following if u is not None]
+    following = [f for f in following if f is not None]
+
+    #print(following)  # liste d'objets User que cet utilisateur suit
     current_user = db.get_user(session["username"])
 
     return render_template("following.html", user=user, following=following, current_user=current_user)
