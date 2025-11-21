@@ -1,11 +1,12 @@
 from .notification import *
 
 class User:
-    def __init__(self, username, email, password, name, age, country, is_public=True):
+    def __init__(self, username, email, password, name, age, country, is_public=True, profile_picture = None):
         self.username = username
         self.email = email
         self.__password = password # Private attribute
         self.name = name
+        self.profile_picture = profile_picture
         self.age = age
         self.country = country
         self.is_public = is_public
@@ -165,5 +166,36 @@ class User:
                     print(f"{i}. {post}")
 
         print("========================\n")
+    
+        def to_dict(self):
+            return {
+            "username": self.username,
+            "password": self.password,
+            "name": self.name,
+            "age": self.age,
+            "country": self.country,
+            "is_public": self.is_public,
+            "profile_picture": self.profile_picture,   # ← ON SAUVEGARDE LA PHOTO
+            "followers": self.followers,
+            "following": self.following,
+            "blocked": self.blocked
+            }
+        
+        @staticmethod
+        def from_dict(data):
+            user = User(
+                username=data["username"],
+                password=data["password"],
+                name=data.get("name", ""),
+                age=data.get("age"),
+                country=data.get("country", ""),
+                is_public=data.get("is_public", True),
+                profile_picture=data.get("profile_picture")  # ← ON RECHARGE LA PHOTO
+            )
+
+            user.followers = data.get("followers", [])
+            user.following = data.get("following", [])
+            user.blocked = data.get("blocked", [])
+            return user
 
     

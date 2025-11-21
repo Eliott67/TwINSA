@@ -5,6 +5,11 @@ import datetime
 import uuid
 from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = "static/profile_pics"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_EXT = {"png", "jpg", "jpeg", "gif"}
 
 # --- Make backend importable ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,6 +47,10 @@ def load_posts_bis(db):
         post.database = db
         post.user = db.get_user(post.poster_username)
         post.content = p["content"]
+
+        # Image éventuelle
+        post.image = p.get("image", None)
+
 
         # convertir la date
         post.date = datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S")
@@ -217,7 +226,7 @@ def feed():
 
 
         # Crée le Post
-        new_post = Post(content, session["username"], db)
+        new_post = Post(content, session["username"], db, image_filename)
 
         post_data = {
             "poster_username": new_post.poster_username,
@@ -487,6 +496,18 @@ def edit_profile2(username):
     if not user or user.username != current_user.username:
         flash("You can only edit your own profile.", "error")
         return redirect(url_for("profile", username=username))
+    
+    # --- Upload photo de profil ---
+    file = request.files.get("profile_picture")
+        
+    if file and file.filename != "":
+        ext = file.filename.rsplit(".", 1)[1].lower()
+        if ext in ALLOWED_EXT:
+            filename = secure_filename(f"{username}_pfp.{ext}")
+            save_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(save_path)
+            user.profile_picture = filename
+            db.save_users()
 
     if request.method == "POST":
         user.name = request.form.get("name", user.name)
