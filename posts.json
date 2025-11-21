@@ -1,8 +1,16 @@
 [
     {
         "poster_username": "test",
+        "content": "test photo",
+        "image": "20251121101633_Logo_INSAvilletoulouse-RVB-carre.jpg",
+        "date": "2025-11-21 10:16:33",
+        "likes": [],
+        "comments": []
+    },
+    {
+        "poster_username": "test",
         "content": "test2",
-        "date": "2025-11-21 09:44:06",
+        "date": "2025-11-21 09:46:02",
         "likes": [],
         "comments": []
     },
