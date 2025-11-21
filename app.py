@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import datetime
+import uuid
 from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
@@ -209,8 +210,11 @@ def feed():
 
     if request.method == "POST":
         content = request.form.get("tweet", "").strip()
-        if not content:
-            flash("Post cannot be empty!", "error")
+        image_file = request.files.get("image")
+
+        # Vérifier qu'il y a au moins un texte ou une image
+        if not content and (not image_file or image_file.filename == ""):
+            flash("You must provide text or an image!", "error")
             return redirect(url_for("feed"))
         
         # Sauvegarder le fichier dans /static/uploads/
@@ -227,6 +231,7 @@ def feed():
         post_data = {
             "poster_username": new_post.poster_username,
             "content": new_post.content,
+            "image": image_filename,   # None si pas d'image
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
             "likes": new_post.likes,
             "comments": []
@@ -361,6 +366,55 @@ def comment(post_index):
                     )
                     db.save_users()
     return redirect(url_for("feed"))
+
+# --- DELETE A POST ---
+@app.route("/delete_post/<int:post_index>", methods=["POST"])
+def delete_post_route(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    posts = load_posts()
+
+    if 0 <= post_index < len(posts):
+        post = posts[post_index]
+        if post["poster_username"] != username:
+            flash("You can only delete your own posts.", "error")
+            return redirect(url_for("feed"))
+
+        posts.pop(post_index)
+        save_posts(posts)
+        flash("Post deleted successfully!", "success")
+
+    return redirect(url_for("feed"))
+
+# --- EDIT A POST ---
+@app.route("/edit_post/<int:post_index>", methods=["POST"])
+def edit_post_route(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    posts = load_posts()
+
+    if 0 <= post_index < len(posts):
+        post = posts[post_index]
+        if post["poster_username"] != username:
+            flash("You can only edit your own posts.", "error")
+            return redirect(url_for("feed"))
+
+        new_content = request.form.get("new_content", "").strip()
+        if not new_content:
+            flash("Content cannot be empty.", "error")
+            return redirect(url_for("feed"))
+
+        post["content"] = new_content
+        post["date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save_posts(posts)
+        flash("Post updated!", "success")
+
+    return redirect(url_for("feed"))
+
 
 
 # --- DELETE A COMMENT ---
