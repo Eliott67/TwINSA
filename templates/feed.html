@@ -101,8 +101,9 @@
 
   <div class="feed-container">
 
-    <form method="POST" class="tweet-form" id="tweetForm">
+    <form method="POST" class="tweet-form" id="tweetForm" enctype="multipart/form-data">
       <textarea id="tweetBox" name="tweet" maxlength="180" placeholder="What's happening?" required></textarea>
+      <input type="file" name="image" accept=".jpg,.jpeg,.png">
       <div class="tweet-footer">
         <span id="charCount">0 / 180</span>
         <button type="submit">Post</button>
@@ -118,14 +119,31 @@
           <div class="tweet">
             <strong>@{{ tweet.poster_username }}</strong>
             <p>{{ tweet.content }}</p>
+
+            {% if tweet.image %}
+              <img src="{{ url_for('static', filename='uploads/' ~ tweet.image) }}" 
+                 alt="Post image" style="max-width: 300px; display:block; margin-top:0.5rem;">
+            {% endif %}    
+              
+
             <small>{{ tweet.date }}</small>
 
             <div class="tweet-actions">
               <a href="{{ url_for('like', post_index=loop.index0) }}" class="like-btn">
                 ❤️ {{ tweet.likes|length }}
               </a>
-              <button class="edit-btn">✏️ Edit</button>
-              <button class="delete-btn">🗑️ Delete</button>
+              <form action="{{ url_for('delete_post_route', post_index=tweet.index) }}" method="POST" style="display:inline;">
+                 <button type="submit" class="delete-btn">🗑️ Delete</button>
+              </form>
+
+              <form action="{{ url_for('edit_post_route', post_index=tweet.index) }}" method="POST" class="edit-form" style="display:none;">
+                <input type="text" name="new_content" value="{{ tweet.content }}" maxlength="180" required>
+                <button type="submit" class="save-edit-btn">💾 Save</button>
+              </form>
+
+              <button class="edit-btn" onclick="toggleEdit(this)">✏️ Edit</button>
+
+              
             </div>
 
             <div class="tweet-comments">
@@ -176,6 +194,14 @@
   tweetBox.addEventListener('input', () => {
     charCount.textContent = tweetBox.value.length + " / 180";
   });
+</script>
+
+<script>
+function toggleEdit(btn) {
+  const tweet = btn.closest(".tweet");
+  const form = tweet.querySelector(".edit-form");
+  form.style.display = form.style.display === "none" ? "block" : "none";
+}
 </script>
 
 {% endblock %}
