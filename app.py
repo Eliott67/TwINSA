@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import datetime
+import uuid
 from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
@@ -200,16 +201,28 @@ def feed():
 
     if request.method == "POST":
         content = request.form.get("tweet", "").strip()
-        if not content:
-            flash("Post cannot be empty!", "error")
-            return redirect(url_for("feed"))
+        image_file = request.files.get("image")
 
-        # Crée un nouvel objet Post
+        # Vérifier qu'il y a au moins un texte ou une image
+        if not content and (not image_file or image_file.filename == ""):
+            flash("You must provide text or an image!", "error")
+            return redirect(url_for("feed"))
+        
+        # Sauvegarder le fichier dans /static/uploads/
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{image_file.filename}"
+        image_file.save(os.path.join(uploads_dir, image_filename))
+
+
+
+        # Crée le Post
         new_post = Post(content, session["username"], db)
 
         post_data = {
             "poster_username": new_post.poster_username,
             "content": new_post.content,
+            "image": image_filename,   # None si pas d'image
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
             "likes": new_post.likes,
             "comments": []
