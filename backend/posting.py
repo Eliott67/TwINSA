@@ -6,11 +6,12 @@ from .users_db import UsersDatabase
 from .notification import LikeNotification, CommentNotification
 
 class Post:
-    def __init__(self, content, poster_username, database):
+    def __init__(self, content, poster_username, database, image=None):
         self.poster_username = poster_username
         self.database = database
         self.user = self.database.get_user(self.poster_username)
-        self.content = content  # Pas de filtrage
+        self.content = content
+        self.image = image  # Pas de filtrage
         self.date = datetime.datetime.now()
         self.likes = []
         self.comments = []
