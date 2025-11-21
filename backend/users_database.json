@@ -252,5 +252,19 @@
         "blocked_users": [],
         "pending_requests": [],
         "notifications": []
+    },
+    "test": {
+        "username": "test",
+        "email": "test@gmail.com",
+        "password": "Test12345!",
+        "name": "",
+        "age": 0,
+        "country": "",
+        "is_public": true,
+        "followers": [],
+        "following": [],
+        "blocked_users": [],
+        "pending_requests": [],
+        "notifications": []
     }
 }

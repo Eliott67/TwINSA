@@ -345,6 +345,55 @@ def comment(post_index):
                     db.save_users()
     return redirect(url_for("feed"))
 
+# --- DELETE A POST ---
+@app.route("/delete_post/<int:post_index>", methods=["POST"])
+def delete_post_route(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    posts = load_posts()
+
+    if 0 <= post_index < len(posts):
+        post = posts[post_index]
+        if post["poster_username"] != username:
+            flash("You can only delete your own posts.", "error")
+            return redirect(url_for("feed"))
+
+        posts.pop(post_index)
+        save_posts(posts)
+        flash("Post deleted successfully!", "success")
+
+    return redirect(url_for("feed"))
+
+# --- EDIT A POST ---
+@app.route("/edit_post/<int:post_index>", methods=["POST"])
+def edit_post_route(post_index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    posts = load_posts()
+
+    if 0 <= post_index < len(posts):
+        post = posts[post_index]
+        if post["poster_username"] != username:
+            flash("You can only edit your own posts.", "error")
+            return redirect(url_for("feed"))
+
+        new_content = request.form.get("new_content", "").strip()
+        if not new_content:
+            flash("Content cannot be empty.", "error")
+            return redirect(url_for("feed"))
+
+        post["content"] = new_content
+        post["date"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save_posts(posts)
+        flash("Post updated!", "success")
+
+    return redirect(url_for("feed"))
+
+
 
 # --- DELETE A COMMENT ---
 @app.route("/delete_comment/<int:post_index>/<int:comment_index>")
