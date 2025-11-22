@@ -167,35 +167,59 @@ class User:
 
         print("========================\n")
     
-        def to_dict(self):
-            return {
-            "username": self.username,
-            "password": self.password,
-            "name": self.name,
-            "age": self.age,
-            "country": self.country,
-            "is_public": self.is_public,
-            "profile_picture": self.profile_picture,   # ← ON SAUVEGARDE LA PHOTO
-            "followers": self.followers,
-            "following": self.following,
-            "blocked": self.blocked
+    def to_dict(self):
+            followers = [
+                f.username if isinstance(f, User) else f
+                for f in getattr(self, "followers", [])
+            ]
+            following = [
+                f.username if isinstance(f, User) else f
+                for f in getattr(self, "following", [])
+            ]
+            blocked_users = [
+                b.username if isinstance(b, User) else b
+                for b in getattr(self, "blocked_users", [])
+            ]
+            pending_requests = [
+                p.username if isinstance(p, User) else p
+                for p in getattr(self, "pending_requests", [])
+            ]
+
+            notifications = list(getattr(self, "notifications", []))
+
+            users_dict = {
+                'username': self.username,
+                'email': self.email,
+                'password': self.get_password(),
+                "name": self.name,
+                "profile_picture" : self.profile_picture,
+                "age": self.age,
+                "country": self.country,
+                'is_public': getattr(self, "is_public", True),
+                'followers': followers,
+                'following': following,
+                'blocked_users': blocked_users,
+                'pending_requests': pending_requests,
+                'notifications': notifications
             }
+            return users_dict
         
-        @staticmethod
-        def from_dict(data):
+    @staticmethod
+    def from_dict(data):
             user = User(
                 username=data["username"],
-                password=data["password"],
+                email=data["email"],
+                password = data["password"],
                 name=data.get("name", ""),
                 age=data.get("age"),
                 country=data.get("country", ""),
                 is_public=data.get("is_public", True),
-                profile_picture=data.get("profile_picture")  # ← ON RECHARGE LA PHOTO
-            )
+                profile_picture=data.get("profile_picture"))  # ← ON RECHARGE LA PHOTO
+            
 
             user.followers = data.get("followers", [])
             user.following = data.get("following", [])
-            user.blocked = data.get("blocked", [])
+            user.blocked_users = data.get("blocked", [])
             return user
 
     

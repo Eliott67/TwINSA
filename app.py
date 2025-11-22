@@ -208,6 +208,10 @@ def feed():
     username = session["username"]
     current_user = db.get_user(username)
 
+    # Toujours initialiser
+    image_file = None
+    image_filename = None
+
     if request.method == "POST":
         content = request.form.get("tweet", "").strip()
         image_file = request.files.get("image")
@@ -218,12 +222,12 @@ def feed():
             return redirect(url_for("feed"))
         
         # Sauvegarder le fichier dans /static/uploads/
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{image_file.filename}"
-        image_file.save(os.path.join(uploads_dir, image_filename))
-
-
+        if image_file and image_file.filename != "":
+            uploads_dir = os.path.join("static", "uploads")
+            os.makedirs(uploads_dir, exist_ok=True)
+            # sécuriser le nom et éviter collisions
+            image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image_file.filename)}"
+            image_file.save(os.path.join(uploads_dir, image_filename))
 
         # Crée le Post
         new_post = Post(content, session["username"], db, image_filename)
@@ -235,12 +239,13 @@ def feed():
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
             "likes": new_post.likes,
             "comments": []
-        }
+            }
         posts.insert(0, post_data)
         current_user.add_post(new_post)
         db.save_users()
         save_posts(posts)
         flash("Post created successfully!", "success")
+    
         return redirect(url_for("feed"))
     
     # 🔎 Filter posts: only from me or people I follow
