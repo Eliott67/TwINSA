@@ -32,7 +32,7 @@ class UsersDatabase:
             with open(self.db_file, 'r', encoding="utf-8") as file:
                 json_file = json.load(file)
             for username_item, data in json_file.items():
-                
+                image = json_file[username_item].get('profile_picture', None)
                 email = json_file[username_item]['email']
                 password = json_file[username_item]['password']
                 name = json_file[username_item]['name']
@@ -48,7 +48,7 @@ class UsersDatabase:
                 notifications = data.get('notifications', [])
 
                 # on recrée l'objet User
-                user_new = User(username_item, email, password, name, age, country, is_public)
+                user_new = User(username_item, email, password, name, age, country, is_public, profile_picture=image)
 
                 # on réinjecte les listes (listes de usernames)
                 user_new.followers = followers
@@ -71,42 +71,8 @@ class UsersDatabase:
         """
         users_dict = {}
 
-        for u in self.users_list:
-            # followers / following / blocked_users / pending_requests
-            # peuvent contenir soit des User, soit déjà des usernames (str)
-            followers = [
-                f.username if isinstance(f, User) else f
-                for f in getattr(u, "followers", [])
-            ]
-            following = [
-                f.username if isinstance(f, User) else f
-                for f in getattr(u, "following", [])
-            ]
-            blocked_users = [
-                b.username if isinstance(b, User) else b
-                for b in getattr(u, "blocked_users", [])
-            ]
-            pending_requests = [
-                p.username if isinstance(p, User) else p
-                for p in getattr(u, "pending_requests", [])
-            ]
-
-            notifications = list(getattr(u, "notifications", []))
-
-            users_dict[u.username] = {
-                'username': u.username,
-                'email': u.email,
-                'password': u.get_password(),
-                'name': u.name,
-                'age': u.age,
-                'country': u.country,
-                'is_public': getattr(u, "is_public", True),
-                'followers': followers,
-                'following': following,
-                'blocked_users': blocked_users,
-                'pending_requests': pending_requests,
-                'notifications': notifications
-            }
+        for user in self.users_list : 
+            users_dict[user.username] = user.to_dict()
 
         with open(self.db_file, 'w', encoding="utf-8") as file:
             json.dump(users_dict, file, indent=4)
