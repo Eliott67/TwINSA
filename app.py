@@ -231,9 +231,11 @@ def feed():
 
         # Crée le Post
         new_post = Post(content, session["username"], db, image_filename)
+        poster_user = db.get_user(new_post.poster_username)
 
         post_data = {
             "poster_username": new_post.poster_username,
+            "poster_pfp": poster_user.profile_picture if poster_user else "default.png",
             "content": new_post.content,
             "image": image_filename,   # None si pas d'image
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
@@ -264,6 +266,11 @@ def feed():
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
+    for p in visible_posts:
+        user = db.get_user(p["poster_username"])
+        p["poster_pfp"] = user.profile_picture if user else "default.png"
+        print(p["poster_pfp"])
+    
     return render_template(
         "feed.html",
         username=session["username"],

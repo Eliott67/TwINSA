@@ -117,7 +117,15 @@
         {% for tweet in tweets %}
           {% set _ = tweet.update({'index': loop.index0}) %}
           <div class="tweet">
-            <strong>@{{ tweet.poster_username }}</strong>
+
+            <div class="tweet-header">
+              <a href="{{ url_for('profile', username=tweet.poster_username) }}">
+                <img src="{{ url_for('static', filename='profile_pics/' ~ tweet.poster_pfp) }}"
+                class="pfp-small" alt="pfp">
+              </a>
+              <strong>@{{ tweet.poster_username }}</strong>
+            </div>
+
             <p>{{ tweet.content }}</p>
 
             {% if tweet.image %}

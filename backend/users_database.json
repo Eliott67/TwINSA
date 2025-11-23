@@ -152,7 +152,6 @@
         "country": "Brasil",
         "is_public": false,
         "followers": [
-            "toto",
             "noa_le_caca",
             "eliott_le_dragon"
         ],
@@ -162,12 +161,15 @@
             "eliott_le_dragon"
         ],
         "blocked_users": [],
-        "pending_requests": [],
+        "pending_requests": [
+            "toto"
+        ],
         "notifications": [
             "toto is now following you.",
             "toto commented on your post: \"cest cool\"",
             "noa_le_caca is now following you.",
-            "eliott_le_dragon is now following you."
+            "eliott_le_dragon is now following you.",
+            "toto has sent you a follow request."
         ]
     },
     "toto": {
@@ -185,7 +187,6 @@
             "eliott_le_dragon"
         ],
         "following": [
-            "leo_le_bg",
             "noa_le_caca",
             "eliott_le_dragon"
         ],
@@ -193,7 +194,11 @@
         "pending_requests": [],
         "notifications": [
             "noa_le_caca is now following you.",
-            "eliott_le_dragon is now following you."
+            "eliott_le_dragon is now following you.",
+            "leo_le_bg liked your post: \"bb\"",
+            "leo_le_bg commented on your post: \"hy\"",
+            "leo_le_bg commented on your post: \"hh\"",
+            "leo_le_bg liked your post: \"c'est bg ce que t'as fait mec\""
         ]
     },
     "noa_le_caca": {
@@ -251,7 +256,9 @@
         "following": [],
         "blocked_users": [],
         "pending_requests": [],
-        "notifications": []
+        "notifications": [
+            "toto liked your post: \"yeahhh\""
+        ]
     },
     "test_final": {
         "username": "test_final",
@@ -281,6 +288,8 @@
         "following": [],
         "blocked_users": [],
         "pending_requests": [],
-        "notifications": []
+        "notifications": [
+            "leo_le_bg liked your post: \"test2\""
+        ]
     }
 }
