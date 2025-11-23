@@ -523,6 +523,9 @@ def edit_profile2(username):
             file.save(save_path)
             user.profile_picture = filename
             db.save_users()
+        else:
+            flash(f"Invalid file type: .{ext}. Allowed types: {', '.join(ALLOWED_EXT)}", "error")
+            return redirect(url_for("edit_profile2", username=username))  # ← retourne à l'édition
 
     if request.method == "POST":
         user.name = request.form.get("name", user.name)
