@@ -74,6 +74,8 @@
 
   .suggestions-list li {
     padding: 0.4rem 0.8rem;
+    color : #3B82F6 ;
+    font-weight: 500;
   }
 
   .suggestions-list li a {
@@ -196,6 +198,35 @@
     border-radius: 999px;
     padding: 0.35rem 0.9rem;
   }
+
+  #selected-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.selected-tag {
+  background: #e5e7eb;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: bold;
+  color : #3B82F6 ;
+}
+
+.selected-tag button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #6b7280;
+}
+.selected-tag button:hover {
+  color: #111827;
+}
+
 </style>
 
 <div class="search-page">
@@ -213,6 +244,22 @@
     <input type="text" name="query" placeholder="Search users..." required>
     <button type="submit" class="btn profile-btn">🔍 Search</button>
   </form>
+
+  <!-- 🔎 Recherche de hashtags -->
+<div class="search-form">
+  <input type="text" id="hashtag-input" placeholder="Search hashtags...">
+</div>
+
+<!-- Suggestions hashtags -->
+<ul id="hashtag-suggestions" class="suggestions-list"></ul>
+
+<!-- Hashtags sélectionnés -->
+<div id="selected-hashtags" style="margin-bottom: 1rem;"></div>
+
+<button id="apply-hashtag-filter" class="btn profile-btn" style="display:none;">
+  Filter Feed with selected hashtags
+</button>
+
 
   <!-- Suggestions -->
   <ul id="suggestions" class="suggestions-list"></ul>
@@ -313,6 +360,74 @@ if (input) {
     });
   });
 }
+/* === 🔥 Hashtag search logic === */
+const hashtagInput = document.getElementById("hashtag-input");
+const hashtagSuggestions = document.getElementById("hashtag-suggestions");
+const selectedDiv = document.getElementById("selected-hashtags");
+const applyBtn = document.getElementById("apply-hashtag-filter");
+
+let selectedTags = [];
+
+if (hashtagInput) {
+  hashtagInput.addEventListener("input", async () => {
+    let q = hashtagInput.value.trim().toLowerCase();
+
+    // on force le # au début
+    if (!q.startsWith("#")) q = "#" + q;
+
+    if (q.length < 2) {
+      hashtagSuggestions.innerHTML = "";
+      return;
+    }
+
+    const res = await fetch(`/api/hashtag_suggestions?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+
+    hashtagSuggestions.innerHTML = "";
+    data.results.forEach(tag => {
+      const li = document.createElement("li");
+      li.style.cursor = "pointer";
+      li.textContent = "#" + tag;
+      li.onclick = () => addTag(tag);
+      hashtagSuggestions.appendChild(li);
+    });
+  });
+}
+
+function addTag(tag) {
+  if (!selectedTags.includes(tag)) {
+    selectedTags.push(tag);
+    renderTags();
+  }
+}
+
+function renderTags() {
+  selectedDiv.innerHTML = "";
+  selectedTags.forEach(tag => {
+    const container = document.createElement("span");
+    container.className = "selected-tag";
+    container.innerHTML = "#" + tag;
+
+    const btn = document.createElement("button");
+    btn.innerHTML = "×";
+    btn.onclick = () => {
+      selectedTags = selectedTags.filter(t => t !== tag);
+      renderTags();
+    };
+
+    container.appendChild(btn);
+    selectedDiv.appendChild(container);
+  });
+
+  // afficher/cacher le bouton selon le nb de tags
+  applyBtn.style.display = selectedTags.length > 0 ? "inline-block" : "none";
+}
+
+applyBtn.addEventListener("click", () => {
+  if (selectedTags.length === 0) return;
+  const param = selectedTags.join(",");
+  window.location.href = `/feed?hashtags=${encodeURIComponent(param)}`;
+});
 </script>
 
 {% endblock %}

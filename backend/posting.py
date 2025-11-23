@@ -1,11 +1,14 @@
 import datetime
 import os
 import json
+import re
 from .user import User
 from .users_db import UsersDatabase
 from .notification import LikeNotification, CommentNotification
 
 class Post:
+     # 🔹 Liste générale de tous les hashtags rencontrés (en mémoire)
+    general_hashtags = set()
     def __init__(self, content, poster_username, database, image=None):
         self.poster_username = poster_username
         self.database = database
@@ -16,12 +19,15 @@ class Post:
         self.likes = []
         self.comments = []
         self.id_comment = 0
+        # 🔹 Extraction des hashtags dans le contenu
+        self.hashtags = self.extract_hashtags(self.content)
+        # 🔹 Mise à jour de la liste générale
+        Post.general_hashtags.update(self.hashtags)
         if self.user is not None:
             self.post_id = len(self.user.posts) + 1
         else:
             self.post_id = 0  # déjà fourni
 
-        self.update_poster_list_posts()
 
     def update_poster_list_posts(self):
         """Met à jour la liste des posts de l’utilisateur."""
@@ -99,4 +105,68 @@ class Post:
                 print(f"  [{c['id']}] {c['username']} ({c['date']}): {c['comment']}")
         else:
             print("No comments yet.")
+
+    @staticmethod
+    def extract_hashtags(text: str):
+        """
+        Extrait les hashtags d'un texte.
+        Règle simple : mots qui commencent par # suivis de lettres/chiffres/underscore.
+        On renvoie une liste de tags sans le #, en minuscules, sans doublons.
+        """
+        if not text:
+            return []
+
+        # Exemple : "Coucou #Insa #maths #Insa_2025" -> ['insa', 'maths', 'insa_2025']
+        raw_tags = re.findall(r"#(\w+)", text)
+
+        seen = set()
+        tags = []
+        for t in raw_tags:
+            t_norm = t.lower()
+            if t_norm not in seen:
+                seen.add(t_norm)
+                tags.append(t_norm)
+        return tags
+
+    @classmethod
+    def get_general_hashtags(cls):
+        """Renvoie la liste générale triée de tous les hashtags."""
+        return sorted(cls.general_hashtags)
+
+
+    def get_html_content(self):
+        """
+        Retourne le contenu du post où les hashtags sont remplacés
+        par des liens cliquables <a href="/hashtag/...">.
+        """
+        formatted = self.content
+
+        for tag in self.hashtags:
+            formatted = formatted.replace(
+                f"#{tag}",
+                f'<a href="/hashtag/{tag}" class="hashtag">#{tag}</a>'
+            )
+
+        return formatted
+    
+    @staticmethod
+    def validate_hashtags(hashtags):
+        """
+        Vérifie que chaque hashtag respecte :
+        - max 10 caractères
+        - uniquement lettres et chiffres
+        Retourne (True, None) si OK
+        Retourne (False, message) si erreur
+        """
+        import re
+        
+        for tag in hashtags:
+            if len(tag) > 10:
+                return False, f"The hashtag #{tag} is too long (max 10 characters)."
+
+            if not re.match(r"^[a-zA-Z0-9]+$", tag):
+                return False, f"The hashtag #{tag} contains invalid characters (letters and numbers only)."
+
+        return True, None
+
 

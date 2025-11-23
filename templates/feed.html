@@ -37,6 +37,110 @@
   .notif-sidebar.open {
     left: 0;
   }
+  .hashtag-filter {
+    margin: 0.5rem 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .hashtag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.8rem;
+    border-radius: 9999px;
+    background: #e5e7eb;
+    font-weight: 600;
+    margin-right: 0.4rem;
+  }
+
+  .clear-filter {
+    font-size: 1.2rem;
+    text-decoration: none;
+    cursor: pointer;
+    color: #6b7280;
+  }
+
+  .clear-filter:hover {
+    color: #111827;
+  }
+
+   /* 🔹 Panneau de filtres dans le feed */
+  .filter-panel {
+    max-width: 800px;
+    margin: 0.5rem auto 1rem auto;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.9rem;
+    display: none;          /* caché par défaut */
+  }
+
+  .filter-panel.open {
+    display: block;
+  }
+
+  .filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .filter-label {
+    font-weight: 600;
+    margin-right: 0.3rem;
+  }
+
+  .filter-separator {
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: #e5e7eb;
+    font-size: 0.85rem;
+  }
+
+  .filter-chip input[type="radio"],
+  .filter-chip input[type="checkbox"] {
+    margin: 0;
+  }
+
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+
+  .btn-clear-filters {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #111827;
+  }
+
+  .btn-clear-filters:hover {
+    background: #f3f4f6;
+  }
+  
 </style>
 
 <!-- 🔔 Bell -->
@@ -91,6 +195,11 @@
       <!-- Search devient bleu : profile-btn -->
       <a href="{{ url_for('search_users') }}" class="btn profile-btn">Search</a>
 
+      <!-- 🔵 Nouveau bouton Filter -->
+      <button type="button" class="btn profile-btn" id="filterToggle">
+        Filter
+      </button>
+
       <!-- Profile reste bleu -->
       <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
 
@@ -112,10 +221,106 @@
 
     <hr>
 
+    <!-- 🔽 Petit panneau de filtres (UI seulement) -->
+    <div id="filterPanel" class="filter-panel">
+      <form method="GET" action="{{ url_for('feed') }}" class="filter-form">
+        
+        <!-- Type de feed -->
+        <div class="filter-row">
+          <span class="filter-label">Feed:</span>
+          <label class="filter-chip">
+            <input 
+              type="radio" 
+              name="feed_type" 
+              value="friends"
+              {% if request.args.get('feed_type', 'friends') != 'discover' %}checked{% endif %}
+            >
+            Friends Feed
+          </label>
+          <label class="filter-chip">
+            <input 
+              type="radio" 
+              name="feed_type" 
+              value="discover"
+              {% if request.args.get('feed_type') == 'discover' %}checked{% endif %}
+            >
+            Discover Feed
+          </label>
+        </div>
+
+        <!-- Période de temps -->
+        <div class="filter-row">
+          <span class="filter-label">Date:</span>
+          <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+          <span class="filter-separator">to</span>
+          <input type="date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+        </div>
+
+        <!-- Type de contenu -->
+        <div class="filter-row">
+          <span class="filter-label">Content:</span>
+
+          <label class="filter-chip">
+            <input 
+              type="checkbox" 
+              name="content_type" 
+              value="text"
+              {% if 'text' in request.args.getlist('content_type') %}checked{% endif %} 
+            >
+            Message
+          </label>
+
+          <label class="filter-chip">
+            <input type="checkbox" name="content_type" value="image"
+            {% if 'image' in request.args.getlist('content_type') %}checked{% endif %}
+            >
+            Image
+          </label>
+
+          <label class="filter-chip">
+            <input type="checkbox" name="content_type" value="hashtag"
+            {% if 'hashtag' in request.args.getlist('content_type') %}checked{% endif %}
+          >
+            Hashtag
+          </label>
+
+          <label class="filter-chip">
+            <input type="checkbox" name="content_type" value="emoji"
+            {% if 'emoji' in request.args.getlist('content_type') %}checked{% endif %}
+          >
+            Emoji
+          </label>
+        </div>
+
+        <!-- Boutons -->
+        <div class="filter-actions">
+          <!-- Pour l’instant, Remove all filters renvoie juste au feed normal -->
+          <a href="{{ url_for('feed') }}" class="btn btn-clear-filters">
+            Remove all filters
+          </a>
+
+          <!-- Save Filters : enverra les paramètres en GET, on fera la logique après -->
+          <button type="submit" class="btn profile-btn">
+            Save Filters
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    {% if selected_hashtags %}
+      <div class="hashtag-filter">
+        {% for tag in selected_hashtags %}
+          <span class="hashtag-chip">#{{ tag }}</span>
+          <a href="{{ unselect_urls[tag] }}" class="clear-filter" title="Remove hashtag">&times;</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+
     <div class="tweets">
       {% if tweets %}
         {% for tweet in tweets %}
-          {% set _ = tweet.update({'index': loop.index0}) %}
           <div class="tweet">
 
             <div class="tweet-header">
@@ -126,7 +331,8 @@
               <strong>@{{ tweet.poster_username }}</strong>
             </div>
 
-            <p>{{ tweet.content }}</p>
+            <p>{{ tweet.html_content | safe }}</p>            
+
 
             {% if tweet.image %}
               <img src="{{ url_for('static', filename='uploads/' ~ tweet.image) }}" 
@@ -137,7 +343,7 @@
             <small>{{ tweet.date }}</small>
 
             <div class="tweet-actions">
-              <a href="{{ url_for('like', post_index=loop.index0) }}" class="like-btn">
+              <a href="{{ url_for('like', post_index=tweet.index) }}" class="like-btn">
                 ❤️ {{ tweet.likes|length }}
               </a>
               <form action="{{ url_for('delete_post_route', post_index=tweet.index) }}" method="POST" style="display:inline;">
@@ -170,7 +376,7 @@
                 {% endfor %}
               {% endif %}
 
-              <form action="{{ url_for('comment', post_index=loop.index0) }}" method="POST" class="comment-form">
+              <form action="{{ url_for('comment', post_index=tweet.index) }}" method="POST" class="comment-form">
                 <input type="text" name="comment" placeholder="Add a comment..." maxlength="120">
                 <button type="submit" class="comment-btn">💬</button>
               </form>
@@ -194,6 +400,16 @@
   notifToggle.addEventListener('click', () => {
     notifSidebar.classList.toggle('open');
   });
+
+  // Toggle du panneau de filtres
+  const filterToggle = document.getElementById("filterToggle");
+  const filterPanel = document.getElementById("filterPanel");
+
+  if (filterToggle && filterPanel) {
+    filterToggle.addEventListener("click", () => {
+      filterPanel.classList.toggle("open");
+    });
+  }
 
   // Char count
   const tweetBox = document.getElementById('tweetBox');
