@@ -1,3 +1,11 @@
 github_action_key
 github_action_key.pub
 backend_airtable/airtable_secrets.py
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environnement virtuel (au cas où)
+venv/
+.env/
