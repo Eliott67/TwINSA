@@ -268,8 +268,11 @@ def feed():
 
     for p in visible_posts:
         user = db.get_user(p["poster_username"])
-        p["poster_pfp"] = user.profile_picture if user else "default.png"
-        print(p["poster_pfp"])
+        if user and user.profile_picture:
+            p["poster_pfp"] = user.profile_picture
+        else:
+            p["poster_pfp"] = "default_pfp.png"
+
     
     return render_template(
         "feed.html",

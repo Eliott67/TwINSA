@@ -1032,3 +1032,13 @@ input:checked + .slider:before {
     border: 2px solid transparent; /* optionnel : ajoute une bordure si tu veux */
     cursor: pointer;
 }
+
+.post-image {
+    max-width: 300px;    /* largeur max */
+    max-height: 300px;   /* hauteur max */
+    width: auto;         /* ajuste automatiquement pour garder le ratio */
+    height: auto;
+    border-radius: 8px;  /* optionnel, coins arrondis */
+    display: block;      /* pour que ça soit proprement en bloc */
+    margin-top: 0.5rem;  /* petit espace au-dessus */
+}
