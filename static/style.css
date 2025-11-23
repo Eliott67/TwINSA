@@ -1012,3 +1012,23 @@ input:checked + .slider:before {
     border: 3px solid #444;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
+
+.tweet-header a {
+    text-decoration: none; /* supprime le soulignement du lien */
+    outline: none;         /* supprime le contour au focus */
+}
+
+.tweet-header a:focus {
+    outline: none;         /* supprime contour rouge/bleu quand on clique */
+}
+
+.pfp-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    border: 2px solid transparent; /* optionnel : ajoute une bordure si tu veux */
+    cursor: pointer;
+}
