@@ -206,7 +206,7 @@
         "email": "noa@gmail.com",
         "password": "Caca@123",
         "name": "",
-        "profile_picture": null,
+        "profile_picture": "noa_le_caca_pfp.png",
         "age": 0,
         "country": "",
         "is_public": true,
