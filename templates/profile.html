@@ -15,7 +15,7 @@
     {% if user.profile_picture %}
         <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_picture) }}" class="profile-picture">
     {% else %}
-        <img src="{{ url_for('static', filename='default_pfp.png') }}" class="profile-picture">
+        <img src="{{ url_for('static', filename='profile_pics/default_pfp.png') }}" class="profile-picture">
     {% endif %}
   </div>
 
@@ -92,7 +92,7 @@
     {% if user.profile_picture %}
         <img src="{{ url_for('static', filename='profile_pics/' ~ user.profile_picture) }}" class="profile-picture">
     {% else %}
-        <img src="{{ url_for('static', filename='default_pfp.png') }}" class="profile-picture">
+        <img src="{{ url_for('static', filename='profile_pics/' ~ 'default_pfp.png') }}" class="profile-picture">
     {% endif %}
   </div>
 
