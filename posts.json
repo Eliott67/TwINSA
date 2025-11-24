@@ -89,7 +89,8 @@
         "image": "20251122104152_",
         "date": "2025-11-22 10:41:52",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 7
     },
     {
         "poster_username": "toto",
@@ -97,7 +98,8 @@
         "image": "20251122104144_",
         "date": "2025-11-22 10:41:44",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 8
     },
     {
         "poster_username": "toto",
@@ -105,7 +107,8 @@
         "image": "20251121201728_20190220_111119.jpg",
         "date": "2025-11-22 10:38:06",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 9
     },
     {
         "poster_username": "test",
@@ -113,7 +116,8 @@
         "image": "20251121101633_Logo_INSAvilletoulouse-RVB-carre.jpg",
         "date": "2025-11-21 10:16:33",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 10
     },
     {
         "poster_username": "test",
@@ -157,7 +161,8 @@
                 "comment": "j'aime le fromage",
                 "date": "2025-11-19 09:51:42"
             }
-        ]
+        ],
+        "index": 14
     },
     {
         "poster_username": "leo_le_bg",
@@ -175,21 +180,24 @@
                 "comment": "cest cool",
                 "date": "2025-11-18 17:13:04"
             }
-        ]
+        ],
+        "index": 15
     },
     {
         "poster_username": "leo_le_bg",
         "content": "trop bien",
         "date": "2025-11-18 11:01:41",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 16
     },
     {
         "poster_username": "Meri",
         "content": "Hola!",
         "date": "2025-11-17 09:10:36",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 17
     },
     {
         "poster_username": "chadha2",
@@ -202,28 +210,32 @@
                 "comment": "hi",
                 "date": "2025-11-17 08:23:47"
             }
-        ]
+        ],
+        "index": 18
     },
     {
         "poster_username": "chadha2",
         "content": "test2",
         "date": "2025-11-14 20:52:16",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 19
     },
     {
         "poster_username": "chadha",
         "content": "test",
         "date": "2025-11-14 20:36:08",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 20
     },
     {
         "poster_username": "Alex",
         "content": "sdfghj",
         "date": "2025-11-14 08:23:51",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 21
     },
     {
         "poster_username": "In\u00e9s",
@@ -249,14 +261,16 @@
                 "comment": "super",
                 "date": "2025-11-15 16:14:46"
             }
-        ]
+        ],
+        "index": 22
     },
     {
         "poster_username": "albert",
         "content": "Hello I love reading",
         "date": "2025-11-14 06:55:02",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "index": 23
     },
     {
         "poster_username": "Eliott",
@@ -287,6 +301,7 @@
                 "comment": "Incroyable ce test eliott",
                 "date": "2025-11-14 06:55:16"
             }
-        ]
+        ],
+        "index": 24
     }
 ]

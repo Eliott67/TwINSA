@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import json
@@ -6,6 +7,7 @@ import uuid
 from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
+from urllib.parse import urlencode
 
 UPLOAD_FOLDER = "static/profile_pics"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -207,6 +209,10 @@ def feed():
     posts = load_posts()
     username = session["username"]
     current_user = db.get_user(username)
+    # Donner l'index global à chaque post
+    for idx, p in enumerate(posts):
+        p["index"] = idx
+
 
     # Toujours initialiser
     image_file = None
@@ -220,16 +226,24 @@ def feed():
         if not content and (not image_file or image_file.filename == ""):
             flash("You must provide text or an image!", "error")
             return redirect(url_for("feed"))
+
+        # 🔍 EXTRACTION + VALIDATION DES HASHTAGS AVANT DE SAUVER
+        hashtags = Post.extract_hashtags(content)
+        is_valid, error_msg = Post.validate_hashtags(hashtags)
+
+        if not is_valid:
+            # On affiche le message et on NE crée PAS le post
+            flash(error_msg or "Hashtags must have max 10 characters and contain only letters or numbers.", "error")
+            return redirect(url_for("feed"))
         
         # Sauvegarder le fichier dans /static/uploads/
         if image_file and image_file.filename != "":
             uploads_dir = os.path.join("static", "uploads")
             os.makedirs(uploads_dir, exist_ok=True)
-            # sécuriser le nom et éviter collisions
             image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image_file.filename)}"
             image_file.save(os.path.join(uploads_dir, image_filename))
 
-        # Crée le Post
+        # Crée le Post (on sait maintenant que les hashtags sont valides)
         new_post = Post(content, session["username"], db, image_filename)
         poster_user = db.get_user(new_post.poster_username)
 
@@ -240,8 +254,10 @@ def feed():
             "image": image_filename,   # None si pas d'image
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
             "likes": new_post.likes,
-            "comments": []
-            }
+            "comments": [],
+            "hashtags": new_post.hashtags,
+            "post_id": new_post.post_id
+        }
         posts.insert(0, post_data)
         current_user.add_post(new_post)
         db.save_users()
@@ -249,18 +265,157 @@ def feed():
         flash("Post created successfully!", "success")
     
         return redirect(url_for("feed"))
-    
-    # 🔎 Filter posts: only from me or people I follow
+
+    # Donner l'index global à chaque post
+    for idx, p in enumerate(posts):
+        p["index"] = idx
+
+    # --- Type de feed : friends vs discover ---
+    feed_type = request.args.get("feed_type", "friends")
+
     visible_posts = posts
+
     if current_user is not None:
-        # set of usernames whose posts I want to see
-        allowed_usernames = set(current_user.following + [username])
-        visible_posts = [
-            p for p in posts
-            if p.get("poster_username") in allowed_usernames
+        if feed_type == "discover":
+            # 🎯 Discover feed : posts de comptes publics
+            # que je NE suis PAS et qui ne sont pas moi
+            visible = []
+            for p in posts:
+                poster = p.get("poster_username")
+                if not poster or poster == username:
+                    continue
+
+                author = db.get_user(poster)
+                if author is None:
+                    continue
+
+                # on ne montre que les comptes publics que je ne suis pas
+                if getattr(author, "is_public", False) and poster not in current_user.following:
+                    visible.append(p)
+
+            visible_posts = visible
+        else:
+            # 👥 Friends feed : les gens que je suis + moi
+            allowed_usernames = set(current_user.following + [username])
+            visible_posts = [
+                p for p in posts
+                if p.get("poster_username") in allowed_usernames
+            ]
+    # si current_user est None (normalement impossible ici), on garde visible_posts = posts
+
+
+    # ---- Lecture des filtres de dates depuis l'URL ----
+    start_date_str = request.args.get("start_date")
+    end_date_str = request.args.get("end_date")
+
+    start_date = None
+    end_date = None
+
+    if start_date_str:
+        try:
+            start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
+        except ValueError:
+            start_date = None
+
+    if end_date_str:
+        try:
+            # on ajoute 1 jour pour inclure toute la journée de fin
+            end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d") + datetime.timedelta(days=1)
+        except ValueError:
+            end_date = None    
+
+    # ---- Filter by content type (text, image, hashtag, emoji) ----
+    content_filters = request.args.getlist("content_type")  # ex: ["text", "image"]
+        
+
+    # --- Hashtag filter via query string ---
+    raw_hashtags = request.args.get("hashtags", "").strip()
+    selected_hashtags = []
+    if raw_hashtags:
+        selected_hashtags = [
+            h.strip().lower()
+            for h in raw_hashtags.split(",")
+            if h.strip()
         ]
-    
-    # Last 20 notifications
+
+    # si des hashtags sont sélectionnés → on filtre
+    if selected_hashtags:
+        filtered_posts = []
+        for p in visible_posts:
+            tags = p.get("hashtags", [])
+            if not tags and "content" in p:
+                temp_post = Post(p["content"], p["poster_username"], db)
+                tags = temp_post.hashtags
+                p["hashtags"] = tags
+
+            tags_lower = [t.lower() for t in tags]
+            # condition OR : au moins un hashtag match
+            if any(tag in tags_lower for tag in selected_hashtags):
+                filtered_posts.append(p)
+
+        # trier du plus récent au plus vieux
+        filtered_posts.sort(
+            key=lambda p: datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S"),
+            reverse=True
+        )
+        visible_posts = filtered_posts
+
+    # ---- Filtre par période (dates) ----
+    if start_date or end_date:
+        filtered_by_date = []
+        for p in visible_posts:
+            date_str = p.get("date", "")
+            try:
+                post_date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                continue  # si la date est mal formée, on ignore ce post
+
+            if start_date and post_date < start_date:
+                continue
+            if end_date and post_date >= end_date:
+                continue
+
+            filtered_by_date.append(p)
+
+        visible_posts = filtered_by_date
+
+    # ---- Filtrer selon le type de contenu ----
+    if content_filters:
+        filtered = []
+        for p in visible_posts:
+            ok = False
+            content = p.get("content", "") or ""
+            image = p.get("image")
+            hashtags = p.get("hashtags", []) or []
+
+            # 1) Texte
+            if "text" in content_filters:
+                if content.strip():
+                    ok = True
+
+            # 2) Image
+            if "image" in content_filters:
+                if image:
+                    ok = True
+
+            # 3) Hashtag
+            if "hashtag" in content_filters:
+                if hashtags:
+                    ok = True
+
+            # 4) Emoji (approx simple : emojis "smiley" de base)
+            if "emoji" in content_filters:
+                import re
+                if re.search(r"[\U0001F300-\U0001FAFF]", content):
+                    ok = True
+
+            if ok:
+                filtered.append(p)
+
+        visible_posts = filtered
+
+
+    # Last 20 notifications 
     notifications = []
     if current_user is not None and hasattr(current_user, "notifications"):
         notifications = list(current_user.notifications)[-20:]
@@ -274,10 +429,39 @@ def feed():
             p["poster_pfp"] = "default_pfp.png"
 
     
+    # --- Convert posts to include clickable hashtags ---
+    formatted_posts = []
+    for p in visible_posts:
+        post_obj = Post(p["content"], p["poster_username"], db)
+        post_obj.hashtags = p.get("hashtags", [])
+        formatted_posts.append({
+            **p,
+            "html_content": post_obj.get_html_content()
+        })
+
+    # URLs pour “désélectionner” chaque hashtag
+    unselect_urls = {}
+    for tag in selected_hashtags:
+        remaining = [t for t in selected_hashtags if t != tag]
+        if remaining:
+            unselect_urls[tag] = url_for("feed", hashtags=",".join(remaining))
+        else:
+            unselect_urls[tag] = url_for("feed")
+
     return render_template(
         "feed.html",
         username=session["username"],
-        tweets=visible_posts,
+        tweets=formatted_posts,
+        notifications=notifications,
+        selected_hashtags=selected_hashtags,
+        unselect_urls=unselect_urls
+    )
+
+
+    return render_template(
+        "feed.html",
+        username=session["username"],
+        tweets=formatted_posts,
         notifications=notifications
     )
 
@@ -915,6 +1099,113 @@ def reset_password():
         return redirect(url_for("login"))
 
     return render_template("reset_password.html")
+
+@app.route("/hashtag/<tag>")
+def hashtag_feed(tag):
+    if "username" not in session:
+        flash("Please sign in to access TwINSA.", "error")
+        return redirect(url_for("login"))
+
+    posts = load_posts()
+    username = session["username"]
+    current_user = db.get_user(username)
+    # Donner l'index global à chaque post
+    for idx, p in enumerate(posts):
+        p["index"] = idx
+
+
+    # 🔎 Même logique que dans /feed : posts visibles = moi + ceux que je suis
+    visible_posts = posts
+    if current_user is not None:
+        allowed_usernames = set(current_user.following + [username])
+        visible_posts = [
+            p for p in posts
+            if p.get("poster_username") in allowed_usernames
+        ]
+
+    tag_lower = tag.lower()
+
+    # 🧩 Filtrer uniquement les posts contenant ce hashtag
+    filtered = []
+    for p in visible_posts:
+        hashtags = p.get("hashtags")
+
+        # Si ancien post sans champ "hashtags", on les reconstruit à partir du contenu
+        if not hashtags:
+            temp_post = Post(p["content"], p["poster_username"], db)
+            hashtags = temp_post.hashtags
+            p["hashtags"] = hashtags  # on enrichit le dict pour plus tard
+
+        hashtags_lower = [h.lower() for h in hashtags]
+        if tag_lower in hashtags_lower:
+            filtered.append(p)
+
+    # 📅 Trier par date (plus récent → plus vieux)
+    filtered.sort(
+        key=lambda p: datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S"),
+        reverse=True
+    )
+
+    # 🔔 Notifications comme dans /feed
+    notifications = []
+    if current_user is not None and hasattr(current_user, "notifications"):
+        notifications = list(current_user.notifications)[-20:]
+        notifications.reverse()
+
+    # ✨ Ajouter html_content (hashtags cliquables) comme pour /feed
+    formatted_posts = []
+    for p in filtered:
+        post_obj = Post(p["content"], p["poster_username"], db)
+        post_obj.hashtags = p.get("hashtags", [])
+        formatted_posts.append({
+            **p,
+            "html_content": post_obj.get_html_content()
+        })
+
+    return render_template(
+        "feed.html",
+        username=username,
+        tweets=formatted_posts,
+        notifications=notifications,
+        selected_hashtag=tag_lower   # 🔹 très important pour l’affichage en haut
+    )
+
+# --- SEARCH hashtag suggestions ---
+@app.route("/api/hashtag_suggestions")
+def hashtag_suggestions():
+    if "username" not in session:
+        return {"results": []}
+
+    query = request.args.get("q", "").strip().lower()
+    if not query:
+        return {"results": []}
+
+    # on enlève le '#' éventuel
+    if query.startswith("#"):
+        query = query[1:]
+
+    posts = load_posts()
+    all_tags = {}
+
+    for p in posts:
+        tags = p.get("hashtags", [])
+        # si jamais hashtags n'est pas stocké, on peut les re-calculer à partir du contenu
+        if not tags and "content" in p:
+            temp_post = Post(p["content"], p["poster_username"], db)
+            tags = temp_post.hashtags
+            p["hashtags"] = tags  # enrichir en mémoire
+
+        for t in tags:
+            t_norm = t.lower()
+            all_tags[t_norm] = all_tags.get(t_norm, 0) + 1
+
+    # filtrage par préfixe
+    suggestions = [t for t in all_tags.keys() if t.startswith(query)]
+
+    # on trie par fréquence décroissante puis alpha
+    suggestions.sort(key=lambda x: (-all_tags[x], x))
+
+    return {"results": suggestions[:10]}
 
 
 if __name__ == "__main__":

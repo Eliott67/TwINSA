@@ -90,12 +90,19 @@
         "country": "",
         "is_public": false,
         "followers": [
-            "F\u00e9lix"
+            "F\u00e9lix",
+            "alex"
         ],
-        "following": [],
+        "following": [
+            "alex"
+        ],
         "blocked_users": [],
-        "pending_requests": [],
-        "notifications": []
+        "pending_requests": [
+            "alex"
+        ],
+        "notifications": [
+            "alex has sent you a follow request."
+        ]
     },
     "lol": {
         "username": "lol",
@@ -121,11 +128,19 @@
         "age": 20,
         "country": "Belgium",
         "is_public": true,
-        "followers": [],
-        "following": [],
+        "followers": [
+            "eliott_le_dragon",
+            "Eliott"
+        ],
+        "following": [
+            "eliott_le_dragon",
+            "Eliott"
+        ],
         "blocked_users": [],
         "pending_requests": [],
-        "notifications": []
+        "notifications": [
+            "Eliott is now following you."
+        ]
     },
     "sara": {
         "username": "sara",
@@ -233,15 +248,19 @@
         "is_public": true,
         "followers": [
             "leo_le_bg",
-            "toto"
+            "toto",
+            "alex"
         ],
         "following": [
             "leo_le_bg",
-            "toto"
+            "toto",
+            "alex"
         ],
         "blocked_users": [],
         "pending_requests": [],
-        "notifications": []
+        "notifications": [
+            "alex is now following you."
+        ]
     },
     "leo_bis": {
         "username": "leo_bis",
