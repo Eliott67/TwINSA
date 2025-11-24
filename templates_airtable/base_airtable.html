@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TwINSA{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Flash messages (infos, erreurs, succès) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Navbar -->
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('create_post') }}">Create Post</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Contenu spécifique à chaque page -->
+    <main>
+      {% block content %}
+      <!-- Formulaire pour créer un post -->
+      {% if current_user.is_authenticated %}
+        <h2>Create a new post</h2>
+        <form action="{{ url_for('create_post') }}" method="POST">
+            <label for="content">Post Content:</label>
+            <textarea name="content" id="content" required></textarea>
+            
+            <label for="images">Images (optional):</label>
+            <input type="text" name="images" id="images" placeholder="Comma-separated image URLs">
+
+            <button type="submit">Post</button>
+        </form>
+      {% endif %}
+
+      <!-- Affichage des posts -->
+      <h3>Your Posts</h3>
+      <ul>
+        {% for post in posts %}
+            <li>{{ post.content }} - <small>Posted at {{ post.date }}</small></li>
+        {% else %}
+            <li>No posts yet. Create one!</li>
+        {% endfor %}
+      </ul>
+      {% endblock %}
+    </main>
+</body>
+</html>

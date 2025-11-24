@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Welcome to TwINSA{% endblock %}
+
+{% block content %}
+<div class="landing">
+  <div class="landing-left">
+    <img src="{{ url_for('static', filename='logo_twinsa.png') }}" alt="TwINSA Logo" class="landing-logo">
+  </div>
+
+  <div class="landing-right">
+    {% if not session.get('username') %}
+      <h2>Happening now</h2>
+      <p>Join TwINSA today.</p>
+      <a href="{{ url_for('login') }}" class="btn btn-large">Sign in</a>
+      <a href="{{ url_for('register') }}" class="btn btn-large">Create account</a>
+      <a href="{{ url_for('forgot_password') }}" class="btn btn-secondary">Forgot password?</a>
+    {% else %}
+      <h2>Welcome back, {{ session['username'] }} 👋</h2>
+      <p>Glad to see you again on TwINSA.</p>
+      <a href="{{ url_for('logout') }}" class="btn btn-large logout">Log out</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

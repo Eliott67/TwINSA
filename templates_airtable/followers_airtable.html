@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Followers - TwINSA{% endblock %}
+
+{% block content %}
+<div class="follow-container">
+    <h2>👥 Followers</h2>
+    <a href="{{ url_for('profile', username=user.username) }}" class="btn back-btn">← Back to Profile</a>
+
+    {% if followers %}
+        <ul class="follow-list">
+            {% for follower in followers %}
+                {% if follower is not none %}
+                    <li class="follow-item">
+                        <div class="follow-user-info">
+                            <div class="follow-avatar">
+                                {% if follower.profile_picture %}
+                                    <img src="{{ url_for('static', filename='profile_pics/' ~ follower.profile_picture) }}" alt="Profile Picture" class="pfp-small">
+                                {% else %}
+                                    <span>👤</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong>@{{ follower.username }}</strong><br>
+                                <span class="follow-name">{{ follower.name }}</span>
+                            </div>
+                        </div>
+
+                        <a href="{{ url_for('profile', username=follower.username) }}" class="btn see-profile-btn">
+                            View profile →
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-msg">No followers yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

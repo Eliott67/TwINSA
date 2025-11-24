@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign in - TwINSA{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <form method="POST" class="auth-form">
+    <h2>Sign in to TwINSA</h2>
+
+    <!-- Formulaire de connexion -->
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+
+    <button type="submit">Sign in</button>
+
+    <p class="form-text">
+      <a href="{{ url_for('forgot_password') }}">Forgot password?</a> |
+      <a href="{{ url_for('register') }}">Create account</a>
+    </p>
+  </form>
+</div>
+{% endblock %}
