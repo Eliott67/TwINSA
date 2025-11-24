@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  APP_DIR: /home/${{ secrets.GCP_VM_USER }}/apps/hello_world_flask_gcp
+  APP_DIR: /home/${{ secrets.GCP_VM_USER }}/TwINSA
 
 jobs:
   deploy:
