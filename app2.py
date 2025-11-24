@@ -33,6 +33,7 @@ app.secret_key = "super_secret_key"
 
 # Initialisation de l'API Airtable pour les posts
 posts_db = AirtablePostsDB(secrets.AIRTABLE_TOKEN, secrets.AIRTABLE_BASE_ID)
+db=AirtableUsersDB(secrets.AIRTABLE_TOKEN, secrets.AIRTABLE_BASE_ID)
 
 # --- Posts file ---
 POSTS_FILE = "posts.json"
