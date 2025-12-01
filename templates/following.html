@@ -19,9 +19,11 @@
                         </div>
                     </div>
 
-                    <a href="{{ url_for('profile', username=follow.username) }}" class="btn see-profile-btn">
+                    <a href="{{ url_for('view_profile', username=follow.username, from_page='following') }}"
+                        class="btn see-profile-btn">
                         View profile →
                     </a>
+
                 </li>
               {% endif %}
             {% endfor %}
