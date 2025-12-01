@@ -651,6 +651,38 @@ def profile(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
+    
+    # params provenant des liens (peuvent être None)
+    origin = request.args.get('origin')    # ex: 'followers' (si on vient d'un follower list)
+    entry = request.args.get('entry')      # ex: 'feed' or 'search' or 'feed?page=2' etc.
+
+    # Si on vient d'une liste followers/following (origin), on veut revenir à cette liste.
+    if origin in ('followers', 'following'):
+        # back vers la liste correspondante en conservant entry si utile
+        back_url = url_for(origin, username=username, entry=entry)
+    else:
+        # sinon back vers entry (si fourni) ou vers feed
+        if entry:
+            # si entry contient une full path (ex: 'search?q=leo') tu peux router différemment,
+            # ici on gère les valeurs simples 'feed' ou 'search'
+            if entry.startswith('/'):   # si tu préfères passer une path complète
+                back_url = entry
+            elif entry == 'feed':
+                back_url = url_for('feed')
+            elif entry.startswith('search'):
+                # si tu as passé 'search?q=...' tu peux reconstruire :
+                # ex si entry == 'search?q=leo' -> split et rediriger vers search avec query
+                if '?' in entry:
+                    base, q = entry.split('?', 1)
+                    # parse q si besoin; simple redirect vers /search?q=...
+                    back_url = url_for('search') + '?' + q
+                else:
+                    back_url = url_for('search')
+            else:
+                # fallback safety
+                back_url = url_for('feed')
+        else:
+            back_url = url_for('feed')
 
     # ÉVALUER LES DROITS AVANT DE MONTRER LES POSTS
     can_view = (
@@ -674,6 +706,7 @@ def profile(username):
     return render_template(
         "profile.html",
         user=user,
+        back_url = back_url,
         current_user=current_user,
         can_view=can_view,
         visible=visible,
@@ -824,6 +857,25 @@ def view_profile(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("search_users"))
+    
+    ref = request.referrer or ""
+
+    origin = request.args.get("from_page")  # récupère followers / following / None
+
+    # Si on arrive d'une liste : followers ou following
+    if origin in ("followers", "following"):
+        session["intermediate_page"] = request.referrer
+
+    # Si on arrive du feed ou search
+    elif "/feed" in ref or "/search" in ref:
+        session["root_entry_page"] = ref
+        session["intermediate_page"] = None
+
+    # Calcul du back_url
+    if session.get("intermediate_page"):
+        back_url = session["intermediate_page"]
+    else:
+        back_url = session.get("root_entry_page", url_for("feed"))
 
     # Vérifier la visibilité du profil
     can_view = user.is_public or current_user.follows(user)
@@ -841,6 +893,7 @@ def view_profile(username):
     return render_template(
         "profile.html",
         user=user,
+        back_url = back_url,
         current_user=current_user,
         can_view=can_view,
         visible=visible, followers = followers, following = following)
@@ -949,6 +1002,8 @@ def view_followers(username):
         flash("User not found.", "error")
         return redirect(url_for("feed"))
     
+    entry = request.args.get("entry", "feed")
+
     followers = []
     followers = [db.get_user(u) for u in user.followers if u is not None]
     followers = [f for f in followers if f is not None]
@@ -956,7 +1011,7 @@ def view_followers(username):
     #print(followers) # liste d'objets User qui suivent cet utilisateur
     current_user = db.get_user(session["username"])
 
-    return render_template("followers.html", user=user, followers=followers, current_user=current_user)
+    return render_template("followers.html",entry=entry, user=user, followers=followers, current_user=current_user)
 
 # --- VIEW FOLLOWING ---
 @app.route("/following/<username>")
@@ -964,6 +1019,8 @@ def view_following(username):
     if "username" not in session:
         flash("Please sign in to view following.", "error")
         return redirect(url_for("login"))
+
+    entry = request.args.get("entry", "feed")
 
     user = db.get_user(username)
 
@@ -978,7 +1035,7 @@ def view_following(username):
     #print(following)  # liste d'objets User que cet utilisateur suit
     current_user = db.get_user(session["username"])
 
-    return render_template("following.html", user=user, following=following, current_user=current_user)
+    return render_template("following.html",entry=entry, user=user, following=following, current_user=current_user)
 
 
 # --- CLEAR SEARCH HISTORY ---

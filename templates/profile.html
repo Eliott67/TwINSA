@@ -8,7 +8,7 @@
   <!-- === PROFILE OWNER VIEW === -->
   <div class="profile-header">
     <h2>Your Profile</h2>
-    <a href="{{ url_for('feed') }}" class="btn back-btn">← Back to Feed</a>
+    <a href="{{ back_url }}" class="btn back-btn">← Back</a>
   </div>
 
   <div class="profile-picture-box">
@@ -29,11 +29,11 @@
   </div>
 
   <div class="follow-counts">
-        <a href="{{ url_for('view_followers', username=user.username) }}" class="follow-link">
+        <a href="{{ url_for('view_followers', username=user.username, entry=request.args.get('entry', 'feed')) }}">Followers</a>
             👥 Followers: <strong>{{ followers|length }}</strong>
         </a>
 
-        <a href="{{ url_for('view_following', username=user.username) }}" class="follow-link">
+        <a href="{{ url_for('view_following', username=user.username, entry=request.args.get('entry', 'feed')) }}">Following</a>
             ➡️ Following: <strong>{{ following|length }}</strong>
         </a>
   </div>
@@ -85,7 +85,7 @@
   <!-- === VIEWING ANOTHER USER'S PROFILE === -->
   <div class="profile-header">
     <h2>{{ user.username }}'s Profile</h2>
-    <a href="javascript:history.back()" class="btn back-btn">← Back</a>
+    <a href="{{ back_url }}" class="btn back-btn">← Back</a>
   </div>
 
   <div class="profile-picture-box">

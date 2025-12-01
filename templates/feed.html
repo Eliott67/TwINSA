@@ -202,7 +202,7 @@
 
       <!-- Profile reste bleu -->
       <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
-
+      
       <!-- Logout reste normal -->
       <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
     </div>
@@ -324,13 +324,12 @@
           <div class="tweet">
 
             <div class="tweet-header">
-              <a href="{{ url_for('profile', username=tweet.poster_username) }}">
+              <a href="{{ url_for('profile', username=tweet.poster_username, entry='feed') }}">
                 <img src="{{ url_for('static', filename='profile_pics/' ~ tweet.poster_pfp) }}"
-                class="pfp-small" alt="pfp">
+                    class="pfp-small" alt="pfp">
               </a>
               <strong>@{{ tweet.poster_username }}</strong>
             </div>
-
             <p>{{ tweet.html_content | safe }}</p>            
 
 
