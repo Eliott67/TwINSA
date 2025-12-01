@@ -29,11 +29,11 @@
   </div>
 
   <div class="follow-counts">
-        <a href="{{ url_for('view_followers', username=user.username, entry=request.args.get('entry', 'feed')) }}">Followers</a>
+        <a href="{{ url_for('view_followers', username=user.username, entry=request.args.get('entry', 'feed')) }}">
             👥 Followers: <strong>{{ followers|length }}</strong>
         </a>
 
-        <a href="{{ url_for('view_following', username=user.username, entry=request.args.get('entry', 'feed')) }}">Following</a>
+        <a href="{{ url_for('view_following', username=user.username, entry=request.args.get('entry', 'feed')) }}">
             ➡️ Following: <strong>{{ following|length }}</strong>
         </a>
   </div>
