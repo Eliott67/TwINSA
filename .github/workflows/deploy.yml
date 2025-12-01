@@ -27,7 +27,7 @@ jobs:
     - name: Deploy code to VM
       run: |
         ssh ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "mkdir -p ${{ env.APP_DIR }}"
-        rsync -az --exclude ".git" --exclude ".github" ./ ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:${{ env.APP_DIR }}/
+        rsync -az --exclude ".git" --exclude ".github" --exclude "users_database.json" --exclude "users_db.json" ./ ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:${{ env.APP_DIR }}/
 
     - name: Install dependencies
       run: |
