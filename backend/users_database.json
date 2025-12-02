@@ -1,8 +1,8 @@
 {
     "alice": {
         "username": "alice",
-        "email": "20201.plissontrehet.thomas@gmail.com",
-        "password": "$2b$12$fi29Am2SrpH7sGrIUIeZHuKsrNfM0yTKCjex0jz4xAHFThd9X48lq",
+        "email": "alice@gmail.com",
+        "password": "$2b$12$rCWUDputjW90K59ezCyFWO.CLToA2xOb/tmDNqlbU0SD5eX9xOi5a",
         "name": "Alice",
         "profile_picture": null,
         "age": 25,

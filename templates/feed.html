@@ -73,7 +73,7 @@
     padding: 0.75rem 1rem;
     border-radius: 0.75rem;
     border: 1px solid #e5e7eb;
-    background: #f9fafb;
+    background: #000000;
     font-size: 0.9rem;
     display: none;          /* caché par défaut */
   }
@@ -111,7 +111,7 @@
     gap: 0.25rem;
     padding: 0.2rem 0.6rem;
     border-radius: 999px;
-    background: #e5e7eb;
+    background: #e4dfdf;
     font-size: 0.85rem;
   }
 
@@ -202,7 +202,7 @@
 
       <!-- Profile reste bleu -->
       <a href="{{ url_for('profile', username=username) }}" class="btn profile-btn">Profile</a>
-
+      
       <!-- Logout reste normal -->
       <a href="{{ url_for('logout') }}" class="btn logout-btn">Log out</a>
     </div>
@@ -324,13 +324,12 @@
           <div class="tweet">
 
             <div class="tweet-header">
-              <a href="{{ url_for('profile', username=tweet.poster_username) }}">
+              <a href="{{ url_for('profile', username=tweet.poster_username, entry='feed') }}">
                 <img src="{{ url_for('static', filename='profile_pics/' ~ tweet.poster_pfp) }}"
-                class="pfp-small" alt="pfp">
+                    class="pfp-small" alt="pfp">
               </a>
               <strong>@{{ tweet.poster_username }}</strong>
             </div>
-
             <p>{{ tweet.html_content | safe }}</p>            
 
 
