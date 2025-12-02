@@ -25,7 +25,7 @@ from backend.user import User
 from backend.change_password import SecureUser
 from backend.registration import validate_registration
 from backend.posting import Post
-from backend.editing_profile import update_personal_info, delete_account  # ✅ Ajout pour profil
+from backend.editing_profile import update_personal_info, delete_account
 from backend.notification import FollowRequestNotification
 
 app = Flask(__name__)
@@ -34,41 +34,13 @@ app.secret_key = "super_secret_key"
 # --- Load database ---
 db = UsersDatabase("backend/users_database.json")
 
+# --- Password reset tokens (email -> token) ---
+reset_tokens = {}
+
 # --- Posts file ---
 POSTS_FILE = "posts.json"
 
-def load_posts_bis(db):
-    raw_posts = load_posts()
-    posts = []
 
-    for p in raw_posts:
-        # On crée un Post SANS exécuter __init__
-        post = Post.__new__(Post)
-
-        post.poster_username = p["poster_username"]
-        post.database = db
-        post.user = db.get_user(post.poster_username)
-        post.content = p["content"]
-
-        # Image éventuelle
-        post.image = p.get("image", None)
-
-
-        # convertir la date
-        post.date = datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S")
-
-        post.likes = p["likes"]
-        post.comments = p["comments"]
-
-        # On RECONSTRUIT l'ID du post
-        post.post_id = p.get("post_id", 0)
-
-        posts.append(post)
-
-    return posts
-
-
-# === Helper functions ===
 def load_posts():
     if os.path.exists(POSTS_FILE):
         with open(POSTS_FILE, "r", encoding="utf-8") as f:
@@ -84,8 +56,27 @@ def save_posts(posts):
         json.dump(posts, f, indent=4, default=str)
 
 
+def load_posts_bis(db):
+    raw_posts = load_posts()
+    posts = []
+
+    for p in raw_posts:
+        post = Post.__new__(Post)
+        post.poster_username = p["poster_username"]
+        post.database = db
+        post.user = db.get_user(post.poster_username)
+        post.content = p["content"]
+        post.image = p.get("image", None)
+        post.date = datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S")
+        post.likes = p["likes"]
+        post.comments = p["comments"]
+        post.post_id = p.get("post_id", 0)
+        posts.append(post)
+
+    return posts
+
+
 def get_secure_user(username):
-    """Convert backend user object into a SecureUser"""
     user_obj = db.get_user(username)
     if not user_obj:
         return None
@@ -95,7 +86,7 @@ def get_secure_user(username):
         password=user_obj.get_password(),
         name=user_obj.name,
         age=user_obj.age,
-        country=user_obj.country
+        country=user_obj.country,
     )
 
 
@@ -141,13 +132,10 @@ def register():
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
-        # New: read the toggle
-        is_public_raw = request.form.get("is_public")  # "on" if checked, None if not
-        is_public = bool(is_public_raw)  # True = public, False = private
+        is_public_raw = request.form.get("is_public")
+        is_public = bool(is_public_raw)
 
         new_user = User(username, email, password, name="", age=0, country="")
-
-        # Set the visibility flag on the user object
         new_user.is_public = is_public
 
         valid, msg = validate_registration(new_user, confirm_password)
@@ -183,18 +171,18 @@ def forgot_password():
             flash("Email not found.", "error")
             return redirect(url_for("forgot_password"))
 
-        su = SecureUser(
-            username=user_found.username,
-            email=user_found.email,
-            password=user_found.get_password(),
-            name=user_found.name,
-            age=user_found.age,
-            country=user_found.country
-        )
-        su.generate_reset_token()
-        print(f"[DEBUG] Reset token for {email}: {su.reset_token}")
-        flash("Password reset code sent (check console).", "success")
-        return redirect(url_for("home"))
+        # Générer un token aléatoire (UUID)
+        token = str(uuid.uuid4())
+
+        # Stocker en mémoire
+        reset_tokens[email] = token
+
+        reset_link = url_for("reset_password", _external=True)
+        print(f"[DEBUG] Reset token for {email}: {token}")
+        print(f"[DEBUG] Reset link: {reset_link}")
+
+        flash("Password reset code generated (see server console for the token).", "success")
+        return redirect(url_for("reset_password"))
 
     return render_template("forgot_password.html")
 
@@ -209,12 +197,10 @@ def feed():
     posts = load_posts()
     username = session["username"]
     current_user = db.get_user(username)
-    # Donner l'index global à chaque post
+
     for idx, p in enumerate(posts):
         p["index"] = idx
 
-
-    # Toujours initialiser
     image_file = None
     image_filename = None
 
@@ -222,28 +208,30 @@ def feed():
         content = request.form.get("tweet", "").strip()
         image_file = request.files.get("image")
 
-        # Vérifier qu'il y a au moins un texte ou une image
         if not content and (not image_file or image_file.filename == ""):
             flash("You must provide text or an image!", "error")
             return redirect(url_for("feed"))
 
-        # 🔍 EXTRACTION + VALIDATION DES HASHTAGS AVANT DE SAUVER
         hashtags = Post.extract_hashtags(content)
         is_valid, error_msg = Post.validate_hashtags(hashtags)
 
         if not is_valid:
-            # On affiche le message et on NE crée PAS le post
-            flash(error_msg or "Hashtags must have max 10 characters and contain only letters or numbers.", "error")
+            flash(
+                error_msg
+                or "Hashtags must have max 10 characters and contain only letters or numbers.",
+                "error",
+            )
             return redirect(url_for("feed"))
-        
-        # Sauvegarder le fichier dans /static/uploads/
+
         if image_file and image_file.filename != "":
             uploads_dir = os.path.join("static", "uploads")
             os.makedirs(uploads_dir, exist_ok=True)
-            image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image_file.filename)}"
+            image_filename = (
+                f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_"
+                f"{secure_filename(image_file.filename)}"
+            )
             image_file.save(os.path.join(uploads_dir, image_filename))
 
-        # Crée le Post (on sait maintenant que les hashtags sont valides)
         new_post = Post(content, session["username"], db, image_filename)
         poster_user = db.get_user(new_post.poster_username)
 
@@ -251,34 +239,29 @@ def feed():
             "poster_username": new_post.poster_username,
             "poster_pfp": poster_user.profile_picture if poster_user else "default.png",
             "content": new_post.content,
-            "image": image_filename,   # None si pas d'image
+            "image": image_filename,
             "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
             "likes": new_post.likes,
             "comments": [],
             "hashtags": new_post.hashtags,
-            "post_id": new_post.post_id
+            "post_id": new_post.post_id,
         }
         posts.insert(0, post_data)
         current_user.add_post(new_post)
         db.save_users()
         save_posts(posts)
         flash("Post created successfully!", "success")
-    
+
         return redirect(url_for("feed"))
 
-    # Donner l'index global à chaque post
     for idx, p in enumerate(posts):
         p["index"] = idx
 
-    # --- Type de feed : friends vs discover ---
     feed_type = request.args.get("feed_type", "friends")
-
     visible_posts = posts
 
     if current_user is not None:
         if feed_type == "discover":
-            # 🎯 Discover feed : posts de comptes publics
-            # que je NE suis PAS et qui ne sont pas moi
             visible = []
             for p in posts:
                 poster = p.get("poster_username")
@@ -289,22 +272,16 @@ def feed():
                 if author is None:
                     continue
 
-                # on ne montre que les comptes publics que je ne suis pas
                 if getattr(author, "is_public", False) and poster not in current_user.following:
                     visible.append(p)
 
             visible_posts = visible
         else:
-            # 👥 Friends feed : les gens que je suis + moi
             allowed_usernames = set(current_user.following + [username])
             visible_posts = [
-                p for p in posts
-                if p.get("poster_username") in allowed_usernames
+                p for p in posts if p.get("poster_username") in allowed_usernames
             ]
-    # si current_user est None (normalement impossible ici), on garde visible_posts = posts
 
-
-    # ---- Lecture des filtres de dates depuis l'URL ----
     start_date_str = request.args.get("start_date")
     end_date_str = request.args.get("end_date")
 
@@ -319,26 +296,17 @@ def feed():
 
     if end_date_str:
         try:
-            # on ajoute 1 jour pour inclure toute la journée de fin
             end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d") + datetime.timedelta(days=1)
         except ValueError:
-            end_date = None    
+            end_date = None
 
-    # ---- Filter by content type (text, image, hashtag, emoji) ----
-    content_filters = request.args.getlist("content_type")  # ex: ["text", "image"]
-        
+    content_filters = request.args.getlist("content_type")
 
-    # --- Hashtag filter via query string ---
     raw_hashtags = request.args.get("hashtags", "").strip()
     selected_hashtags = []
     if raw_hashtags:
-        selected_hashtags = [
-            h.strip().lower()
-            for h in raw_hashtags.split(",")
-            if h.strip()
-        ]
+        selected_hashtags = [h.strip().lower() for h in raw_hashtags.split(",") if h.strip()]
 
-    # si des hashtags sont sélectionnés → on filtre
     if selected_hashtags:
         filtered_posts = []
         for p in visible_posts:
@@ -349,18 +317,15 @@ def feed():
                 p["hashtags"] = tags
 
             tags_lower = [t.lower() for t in tags]
-            # condition OR : au moins un hashtag match
             if any(tag in tags_lower for tag in selected_hashtags):
                 filtered_posts.append(p)
 
-        # trier du plus récent au plus vieux
         filtered_posts.sort(
             key=lambda p: datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S"),
-            reverse=True
+            reverse=True,
         )
         visible_posts = filtered_posts
 
-    # ---- Filtre par période (dates) ----
     if start_date or end_date:
         filtered_by_date = []
         for p in visible_posts:
@@ -368,7 +333,7 @@ def feed():
             try:
                 post_date = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
             except ValueError:
-                continue  # si la date est mal formée, on ignore ce post
+                continue
 
             if start_date and post_date < start_date:
                 continue
@@ -379,7 +344,6 @@ def feed():
 
         visible_posts = filtered_by_date
 
-    # ---- Filtrer selon le type de contenu ----
     if content_filters:
         filtered = []
         for p in visible_posts:
@@ -388,24 +352,16 @@ def feed():
             image = p.get("image")
             hashtags = p.get("hashtags", []) or []
 
-            # 1) Texte
-            if "text" in content_filters:
-                if content.strip():
-                    ok = True
+            if "text" in content_filters and content.strip():
+                ok = True
 
-            # 2) Image
-            if "image" in content_filters:
-                if image:
-                    ok = True
+            if "image" in content_filters and image:
+                ok = True
 
-            # 3) Hashtag
-            if "hashtag" in content_filters:
-                if hashtags:
-                    ok = True
+            if "hashtag" in content_filters and hashtags:
+                ok = True
 
-            # 4) Emoji (approx simple : emojis "smiley" de base)
             if "emoji" in content_filters:
-                import re
                 if re.search(r"[\U0001F300-\U0001FAFF]", content):
                     ok = True
 
@@ -414,8 +370,6 @@ def feed():
 
         visible_posts = filtered
 
-
-    # Last 20 notifications 
     notifications = []
     if current_user is not None and hasattr(current_user, "notifications"):
         notifications = list(current_user.notifications)[-20:]
@@ -428,18 +382,12 @@ def feed():
         else:
             p["poster_pfp"] = "default_pfp.png"
 
-    
-    # --- Convert posts to include clickable hashtags ---
     formatted_posts = []
     for p in visible_posts:
         post_obj = Post(p["content"], p["poster_username"], db)
         post_obj.hashtags = p.get("hashtags", [])
-        formatted_posts.append({
-            **p,
-            "html_content": post_obj.get_html_content()
-        })
+        formatted_posts.append({**p, "html_content": post_obj.get_html_content()})
 
-    # URLs pour “désélectionner” chaque hashtag
     unselect_urls = {}
     for tag in selected_hashtags:
         remaining = [t for t in selected_hashtags if t != tag]
@@ -454,15 +402,7 @@ def feed():
         tweets=formatted_posts,
         notifications=notifications,
         selected_hashtags=selected_hashtags,
-        unselect_urls=unselect_urls
-    )
-
-
-    return render_template(
-        "feed.html",
-        username=session["username"],
-        tweets=formatted_posts,
-        notifications=notifications
+        unselect_urls=unselect_urls,
     )
 
 
@@ -476,13 +416,11 @@ def notifications():
     username = session["username"]
     current_user = db.get_user(username)
 
-    # Last 20 notifications
     notifications = []
     if current_user is not None and hasattr(current_user, "notifications"):
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
-    # Pending follow requests for the logged-in user
     pending_requests = []
     if current_user is not None and hasattr(current_user, "pending_requests"):
         pending_requests = current_user.pending_requests
@@ -491,7 +429,7 @@ def notifications():
         "notifications.html",
         username=username,
         notifications=notifications,
-        pending_requests=pending_requests
+        pending_requests=pending_requests,
     )
 
 
@@ -506,32 +444,27 @@ def like(post_index):
         post = posts[post_index]
         username = session["username"]
 
-        # Was it already liked?
         already_liked = username in post["likes"]
 
         if already_liked:
-            # Unlike
             post["likes"].remove(username)
         else:
-            # New like
             post["likes"].append(username)
 
-            # 🔔 Notify the owner of the post (if it's not yourself)
             owner_username = post.get("poster_username")
             if owner_username and owner_username != username:
                 owner = db.get_user(owner_username)
                 if owner is not None and hasattr(owner, "notifications"):
-                    # Short preview of the post content
                     preview = post.get("content", "")
                     if len(preview) > 40:
                         preview = preview[:40] + "…"
                     owner.notifications.append(
                         f"{username} liked your post: \"{preview}\""
                     )
-                    db.save_users()  # persist notifications
+                    db.save_users()
 
         save_posts(posts)
-    
+
     return redirect(url_for("feed"))
 
 
@@ -554,7 +487,6 @@ def comment(post_index):
             posts[post_index]["comments"].append(comment)
             save_posts(posts)
 
-            # 🔔 Notify the owner of the post (if commenter != owner)
             owner_username = posts[post_index].get("poster_username")
             if owner_username and owner_username != username:
                 owner = db.get_user(owner_username)
@@ -565,6 +497,7 @@ def comment(post_index):
                     )
                     db.save_users()
     return redirect(url_for("feed"))
+
 
 # --- DELETE A POST ---
 @app.route("/delete_post/<int:post_index>", methods=["POST"])
@@ -586,6 +519,7 @@ def delete_post_route(post_index):
         flash("Post deleted successfully!", "success")
 
     return redirect(url_for("feed"))
+
 
 # --- EDIT A POST ---
 @app.route("/edit_post/<int:post_index>", methods=["POST"])
@@ -615,7 +549,6 @@ def edit_post_route(post_index):
     return redirect(url_for("feed"))
 
 
-
 # --- DELETE A COMMENT ---
 @app.route("/delete_comment/<int:post_index>/<int:comment_index>")
 def delete_comment(post_index, comment_index):
@@ -629,7 +562,6 @@ def delete_comment(post_index, comment_index):
         comments = posts[post_index].get("comments", [])
         if 0 <= comment_index < len(comments):
             comment = comments[comment_index]
-            # Seul l’auteur du commentaire peut le supprimer
             if comment["username"] == username:
                 comments.pop(comment_index)
                 posts[post_index]["comments"] = comments
@@ -638,84 +570,72 @@ def delete_comment(post_index, comment_index):
 
     return redirect(url_for("feed"))
 
+
+# --- PROFILE ---
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
     if "username" not in session:
         flash("Please sign in to access your profile.", "error")
         return redirect(url_for("login"))
 
-    current_user = db.get_user(session["username"])  # connecté
-    user = db.get_user(username)  # profil à afficher
-    db.get_user(session["username"])
+    current_user = db.get_user(session["username"])
+    user = db.get_user(username)
 
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
-    
-    # params provenant des liens (peuvent être None)
-    origin = request.args.get('origin')    # ex: 'followers' (si on vient d'un follower list)
-    entry = request.args.get('entry')      # ex: 'feed' or 'search' or 'feed?page=2' etc.
 
-    # Si on vient d'une liste followers/following (origin), on veut revenir à cette liste.
-    if origin in ('followers', 'following'):
-        # back vers la liste correspondante en conservant entry si utile
+    origin = request.args.get("origin")
+    entry = request.args.get("entry")
+
+    if origin in ("followers", "following"):
         back_url = url_for(origin, username=username, entry=entry)
     else:
-        # sinon back vers entry (si fourni) ou vers feed
         if entry:
-            # si entry contient une full path (ex: 'search?q=leo') tu peux router différemment,
-            # ici on gère les valeurs simples 'feed' ou 'search'
-            if entry.startswith('/'):   # si tu préfères passer une path complète
+            if entry.startswith("/"):
                 back_url = entry
-            elif entry == 'feed':
-                back_url = url_for('feed')
-            elif entry.startswith('search'):
-                # si tu as passé 'search?q=...' tu peux reconstruire :
-                # ex si entry == 'search?q=leo' -> split et rediriger vers search avec query
-                if '?' in entry:
-                    base, q = entry.split('?', 1)
-                    # parse q si besoin; simple redirect vers /search?q=...
-                    back_url = url_for('search') + '?' + q
+            elif entry == "feed":
+                back_url = url_for("feed")
+            elif entry.startswith("search"):
+                if "?" in entry:
+                    base, q = entry.split("?", 1)
+                    back_url = url_for("search_users") + "?" + q
                 else:
-                    back_url = url_for('search')
+                    back_url = url_for("search_users")
             else:
-                # fallback safety
-                back_url = url_for('feed')
+                back_url = url_for("feed")
         else:
-            back_url = url_for('feed')
+            back_url = url_for("feed")
 
-    # ÉVALUER LES DROITS AVANT DE MONTRER LES POSTS
     can_view = (
-        user.is_public 
+        user.is_public
         or current_user.follows(user)
         or user.username == current_user.username
     )
-    followers = [db.get_user(u) for u in user.followers ]
+
+    followers = [db.get_user(u) for u in user.followers]
     followers = [f for f in followers if f is not None]
-    following = [db.get_user(u) for u in user.following ]
+    following = [db.get_user(u) for u in user.following]
     following = [f for f in following if f is not None]
 
     visible = []
-    
-    # Charger les posts SEULEMENT si autorisé
     if can_view:
         posts = load_posts_bis(db)
         visible = [p for p in posts if p.poster_username == username]
-    print(followers)
-    print(following)
+
     return render_template(
         "profile.html",
         user=user,
-        back_url = back_url,
+        back_url=back_url,
         current_user=current_user,
         can_view=can_view,
         visible=visible,
-        followers = followers,
-        following=following
+        followers=followers,
+        following=following,
     )
 
 
-
+# --- EDIT PROFILE ---
 @app.route("/edit_profile/<username>/edit", methods=["GET", "POST"])
 def edit_profile2(username):
     if "username" not in session:
@@ -728,10 +648,9 @@ def edit_profile2(username):
     if not user or user.username != current_user.username:
         flash("You can only edit your own profile.", "error")
         return redirect(url_for("profile", username=username))
-    
-    # --- Upload photo de profil ---
+
     file = request.files.get("profile_picture")
-        
+
     if file and file.filename != "":
         ext = file.filename.rsplit(".", 1)[1].lower()
         if ext in ALLOWED_EXT:
@@ -741,12 +660,19 @@ def edit_profile2(username):
             user.profile_picture = filename
             db.save_users()
         else:
-            flash(f"Invalid file type: .{ext}. Allowed types: {', '.join(ALLOWED_EXT)}", "error")
-            return redirect(url_for("edit_profile2", username=username))  # ← retourne à l'édition
+            flash(
+                f"Invalid file type: .{ext}. Allowed types: {', '.join(ALLOWED_EXT)}",
+                "error",
+            )
+            return redirect(url_for("edit_profile2", username=username))
 
     if request.method == "POST":
         user.name = request.form.get("name", user.name)
-        user.age = int(request.form.get("age", user.age or 0)) if request.form.get("age") else user.age
+        user.age = (
+            int(request.form.get("age", user.age or 0))
+            if request.form.get("age")
+            else user.age
+        )
         user.country = request.form.get("country", user.country)
 
         privacy = request.form.get("privacy")
@@ -791,7 +717,6 @@ def search_users():
 
     current_user = db.get_user(session["username"])
 
-    # Historique de recherche stocké dans la session
     if "search_history" not in session:
         session["search_history"] = []
 
@@ -801,24 +726,25 @@ def search_users():
         query = request.form.get("query", "").strip()
         if query:
             all_users = db.get_all_users()
-            # Recherche par prefixe (insensible à la casse)
-            matches = [u for u in all_users if u.username.lower().startswith(query.lower())]
+            matches = [
+                u for u in all_users if u.username.lower().startswith(query.lower())
+            ]
 
-            # Trier : d'abord les suivis, puis alphabétique
-            matches.sort(key=lambda u: (not current_user.follows(u), u.username.lower()))
+            matches.sort(
+                key=lambda u: (not current_user.follows(u), u.username.lower())
+            )
             results = matches[:10]
 
-            # Mettre à jour l'historique
             if query not in session["search_history"]:
                 session["search_history"].insert(0, query)
             session["search_history"] = session["search_history"][:5]
-            session.modified = True  # pour que Flask enregistre la session
+            session.modified = True
 
     return render_template(
         "search.html",
         current_user=current_user,
         results=results,
-        history=session.get("search_history", [])
+        history=session.get("search_history", []),
     )
 
 
@@ -835,16 +761,19 @@ def search_suggestions():
     current_user = db.get_user(session["username"])
     all_users = db.get_all_users()
 
-    # Même logique que ta console : match par préfixe
     matches = [u.username for u in all_users if u.username.lower().startswith(query)]
 
-    # Trier : suivis d’abord, puis alphabétique
-    matches.sort(key=lambda uname: (not current_user.follows(db.get_user(uname)), uname.lower()))
+    matches.sort(
+        key=lambda uname: (
+            not current_user.follows(db.get_user(uname)),
+            uname.lower(),
+        )
+    )
 
     return {"results": matches[:10]}
 
 
-# --- VIEW PROFILE ---
+# --- VIEW PROFILE (via search / followers / following) ---
 @app.route("/view_profile/<username>")
 def view_profile(username):
     if "username" not in session:
@@ -857,29 +786,23 @@ def view_profile(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("search_users"))
-    
+
     ref = request.referrer or ""
+    origin = request.args.get("from_page")
 
-    origin = request.args.get("from_page")  # récupère followers / following / None
-
-    # Si on arrive d'une liste : followers ou following
     if origin in ("followers", "following"):
         session["intermediate_page"] = request.referrer
-
-    # Si on arrive du feed ou search
     elif "/feed" in ref or "/search" in ref:
         session["root_entry_page"] = ref
         session["intermediate_page"] = None
 
-    # Calcul du back_url
     if session.get("intermediate_page"):
         back_url = session["intermediate_page"]
     else:
         back_url = session.get("root_entry_page", url_for("feed"))
 
-    # Vérifier la visibilité du profil
     can_view = user.is_public or current_user.follows(user)
-    visible= list()
+    visible = []
     if can_view:
         posts = load_posts_bis(db)
         visible = [p for p in posts if p.poster_username == username]
@@ -889,14 +812,16 @@ def view_profile(username):
     following = [db.get_user(u) for u in user.following if u is not None]
     following = [f for f in following if f is not None]
 
-
     return render_template(
         "profile.html",
         user=user,
-        back_url = back_url,
+        back_url=back_url,
         current_user=current_user,
         can_view=can_view,
-        visible=visible, followers = followers, following = following)
+        visible=visible,
+        followers=followers,
+        following=following,
+    )
 
 
 # --- FOLLOW USER ---
@@ -934,7 +859,7 @@ def unfollow_user(username):
 
 
 # -- SEND FOLLOW REQUEST --
-@app.route('/send_follow_request/<username>', methods=['POST'])
+@app.route("/send_follow_request/<username>", methods=["POST"])
 def send_follow_request(username):
     if "username" not in session:
         flash("Please sign in to send follow requests.", "error")
@@ -944,17 +869,17 @@ def send_follow_request(username):
     user = db.get_user(username)
     if not user:
         flash("User not found.", "error")
-        return redirect(url_for('search_users'))
+        return redirect(url_for("search_users"))
 
     if user.username == current_user.username or current_user.follows(user):
         flash("Cannot follow this user.", "error")
-        return redirect(url_for('search_users'))
+        return redirect(url_for("search_users"))
 
     notif = FollowRequestNotification(sender=current_user, receiver=user)
     notif.send_request()
 
     flash(f"Follow request sent to {user.username}!", "success")
-    return redirect(url_for('search_users'))
+    return redirect(url_for("search_users"))
 
 
 # -- BLOCK USER --
@@ -990,6 +915,7 @@ def unblock_user(username):
         flash("User not found.", "error")
     return redirect(request.referrer or url_for("feed"))
 
+
 # --- VIEW FOLLOWERS ---
 @app.route("/followers/<username>")
 def view_followers(username):
@@ -1001,17 +927,21 @@ def view_followers(username):
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
-    
+
     entry = request.args.get("entry", "feed")
 
-    followers = []
     followers = [db.get_user(u) for u in user.followers if u is not None]
     followers = [f for f in followers if f is not None]
-
-    #print(followers) # liste d'objets User qui suivent cet utilisateur
     current_user = db.get_user(session["username"])
 
-    return render_template("followers.html",entry=entry, user=user, followers=followers, current_user=current_user)
+    return render_template(
+        "followers.html",
+        entry=entry,
+        user=user,
+        followers=followers,
+        current_user=current_user,
+    )
+
 
 # --- VIEW FOLLOWING ---
 @app.route("/following/<username>")
@@ -1023,19 +953,21 @@ def view_following(username):
     entry = request.args.get("entry", "feed")
 
     user = db.get_user(username)
-
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("feed"))
 
-    following = []
     following = [db.get_user(u) for u in user.following if u is not None]
     following = [f for f in following if f is not None]
-
-    #print(following)  # liste d'objets User que cet utilisateur suit
     current_user = db.get_user(session["username"])
 
-    return render_template("following.html",entry=entry, user=user, following=following, current_user=current_user)
+    return render_template(
+        "following.html",
+        entry=entry,
+        user=user,
+        following=following,
+        current_user=current_user,
+    )
 
 
 # --- CLEAR SEARCH HISTORY ---
@@ -1061,19 +993,22 @@ def suggestions():
     current_user = db.get_user(session["username"])
     all_users = db.get_all_users()
 
-    # Filtrer : public, non suivi et pas bloqué
     suggested_users = [
-        u for u in all_users
+        u
+        for u in all_users
         if u.username != current_user.username
-        and current_user.follows(u) == False
+        and current_user.follows(u) is False
         and u.username not in current_user.blocked_users
         and u.is_public
     ]
 
-    # On peut trier par nombre de followers décroissant
     suggested_users.sort(key=lambda u: len(u.followers), reverse=True)
 
-    return render_template("suggestions.html", current_user=current_user, suggested_users=suggested_users)
+    return render_template(
+        "suggestions.html",
+        current_user=current_user,
+        suggested_users=suggested_users,
+    )
 
 
 # --- CHANGE PASSWORD (WHEN LOGGED IN) ---
@@ -1090,21 +1025,17 @@ def change_password():
         new_password = request.form.get("new_password")
         confirm = request.form.get("confirm_password")
 
-        # Vérification ancien mdp
         if user.get_password() != old_password:
             flash("Incorrect current password.", "error")
             return redirect(url_for("change_password"))
 
-        # Vérification double saisie
         if new_password != confirm:
             flash("Passwords do not match.", "error")
             return redirect(url_for("change_password"))
 
-        # Update
         user.password = new_password
         db.save_users()
         flash("Password updated successfully!", "success")
-        # ⚠️ Cette route redirige sans username, tu pourras l'ajuster plus tard si besoin
         return redirect(url_for("profile", username=user.username))
 
     return render_template("change_password.html")
@@ -1114,12 +1045,11 @@ def change_password():
 @app.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
     if request.method == "POST":
-        email = request.form.get("email").strip()
-        token = request.form.get("token").strip()
+        email = request.form.get("email", "").strip()
+        token = request.form.get("token", "").strip()
         new_password = request.form.get("new_password")
         confirm = request.form.get("confirm_password")
 
-        # Trouver l'utilisateur
         user = None
         for u in db.get_all_users():
             if u.email == email:
@@ -1130,35 +1060,28 @@ def reset_password():
             flash("Email not found.", "error")
             return redirect(url_for("reset_password"))
 
-        # Vérifier token (il est stocké dans SecureUser.generate_reset_token())
-        su = SecureUser(
-            username=user.username,
-            email=user.email,
-            password=user.get_password(),
-            name=user.name,
-            age=user.age,
-            country=user.country
-        )
-
-        # On vérifie le token existant
-        if su.reset_token != token:
-            flash("Invalid reset token.", "error")
+        expected_token = reset_tokens.get(email)
+        if not expected_token or expected_token != token:
+            flash("Invalid or expired reset token.", "error")
             return redirect(url_for("reset_password"))
 
         if new_password != confirm:
             flash("Passwords do not match.", "error")
             return redirect(url_for("reset_password"))
 
-        # Appliquer le changement
         user.password = new_password
         db.save_users()
-        flash("Password reset successfully!", "success")
+        del reset_tokens[email]
+
+        flash("Password reset successfully! You can now sign in.", "success")
         return redirect(url_for("login"))
 
     return render_template("reset_password.html")
 
+
+# --- HASHTAG FEED ---
 @app.route("/hashtag/<tag>", methods=["GET", "POST"])
-def hashtag_feed(tag):  
+def hashtag_feed(tag):
     if "username" not in session:
         flash("Please sign in to access TwINSA.", "error")
         return redirect(url_for("login"))
@@ -1167,12 +1090,10 @@ def hashtag_feed(tag):
     username = session["username"]
     current_user = db.get_user(username)
 
-     # 🔹 Nouveau : gérer la création de post même sur une page hashtag
     if request.method == "POST":
         content = request.form.get("tweet", "").strip()
         image_file = request.files.get("image")
 
-        # Même validation que dans /feed
         if not content and (not image_file or image_file.filename == ""):
             flash("You must provide text or an image!", "error")
             return redirect(url_for("hashtag_feed", tag=tag))
@@ -1180,17 +1101,23 @@ def hashtag_feed(tag):
         hashtags = Post.extract_hashtags(content)
         is_valid, error_msg = Post.validate_hashtags(hashtags)
         if not is_valid:
-            flash(error_msg or "Hashtags must have max 10 characters and contain only letters or numbers.", "error")
+            flash(
+                error_msg
+                or "Hashtags must have max 10 characters and contain only letters or numbers.",
+                "error",
+            )
             return redirect(url_for("hashtag_feed", tag=tag))
 
         image_filename = None
         if image_file and image_file.filename != "":
             uploads_dir = os.path.join("static", "uploads")
             os.makedirs(uploads_dir, exist_ok=True)
-            image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image_file.filename)}"
+            image_filename = (
+                f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_"
+                f"{secure_filename(image_file.filename)}"
+            )
             image_file.save(os.path.join(uploads_dir, image_filename))
 
-        # Création du post (même logique que /feed)
         new_post = Post(content, username, db, image_filename)
         poster_user = db.get_user(new_post.poster_username)
 
@@ -1206,78 +1133,65 @@ def hashtag_feed(tag):
             "post_id": new_post.post_id,
         }
 
-        # On ajoute en tête comme dans /feed
         posts.insert(0, post_data)
         current_user.add_post(new_post)
         db.save_users()
         save_posts(posts)
         flash("Post created successfully!", "success")
 
-        # 🔁 On reste sur la page filtrée
         return redirect(url_for("hashtag_feed", tag=tag))
 
-    # Donner l'index global à chaque post
     for idx, p in enumerate(posts):
         p["index"] = idx
 
-
-    # 🔎 Même logique que dans /feed : posts visibles = moi + ceux que je suis
     visible_posts = posts
     if current_user is not None:
         allowed_usernames = set(current_user.following + [username])
         visible_posts = [
-            p for p in posts
-            if p.get("poster_username") in allowed_usernames
+            p for p in posts if p.get("poster_username") in allowed_usernames
         ]
 
     tag_lower = tag.lower()
 
-    # 🧩 Filtrer uniquement les posts contenant ce hashtag
     filtered = []
     for p in visible_posts:
         hashtags = p.get("hashtags")
 
-        # Si ancien post sans champ "hashtags", on les reconstruit à partir du contenu
         if not hashtags:
             temp_post = Post(p["content"], p["poster_username"], db)
             hashtags = temp_post.hashtags
-            p["hashtags"] = hashtags  # on enrichit le dict pour plus tard
+            p["hashtags"] = hashtags
 
         hashtags_lower = [h.lower() for h in hashtags]
         if tag_lower in hashtags_lower:
             filtered.append(p)
 
-    # 📅 Trier par date (plus récent → plus vieux)
     filtered.sort(
         key=lambda p: datetime.datetime.strptime(p["date"], "%Y-%m-%d %H:%M:%S"),
-        reverse=True
+        reverse=True,
     )
 
-    # 🔔 Notifications comme dans /feed
     notifications = []
     if current_user is not None and hasattr(current_user, "notifications"):
         notifications = list(current_user.notifications)[-20:]
         notifications.reverse()
 
-    # ✨ Ajouter html_content (hashtags cliquables) comme pour /feed
     formatted_posts = []
     for p in filtered:
         post_obj = Post(p["content"], p["poster_username"], db)
         post_obj.hashtags = p.get("hashtags", [])
-        formatted_posts.append({
-            **p,
-            "html_content": post_obj.get_html_content()
-        })
+        formatted_posts.append({**p, "html_content": post_obj.get_html_content()})
 
     return render_template(
         "feed.html",
         username=username,
         tweets=formatted_posts,
         notifications=notifications,
-        selected_hashtag=tag_lower   # 🔹 très important pour l’affichage en haut
+        selected_hashtag=tag_lower,
     )
 
-# --- SEARCH hashtag suggestions ---
+
+# --- SEARCH HASHTAG SUGGESTIONS ---
 @app.route("/api/hashtag_suggestions")
 def hashtag_suggestions():
     if "username" not in session:
@@ -1287,7 +1201,6 @@ def hashtag_suggestions():
     if not query:
         return {"results": []}
 
-    # on enlève le '#' éventuel
     if query.startswith("#"):
         query = query[1:]
 
@@ -1296,24 +1209,20 @@ def hashtag_suggestions():
 
     for p in posts:
         tags = p.get("hashtags", [])
-        # si jamais hashtags n'est pas stocké, on peut les re-calculer à partir du contenu
         if not tags and "content" in p:
             temp_post = Post(p["content"], p["poster_username"], db)
             tags = temp_post.hashtags
-            p["hashtags"] = tags  # enrichir en mémoire
+            p["hashtags"] = tags
 
         for t in tags:
             t_norm = t.lower()
             all_tags[t_norm] = all_tags.get(t_norm, 0) + 1
 
-    # filtrage par préfixe
     suggestions = [t for t in all_tags.keys() if t.startswith(query)]
-
-    # on trie par fréquence décroissante puis alpha
     suggestions.sort(key=lambda x: (-all_tags[x], x))
 
     return {"results": suggestions[:10]}
 
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
-
