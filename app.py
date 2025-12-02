@@ -1157,8 +1157,8 @@ def reset_password():
 
     return render_template("reset_password.html")
 
-@app.route("/hashtag/<tag>")
-def hashtag_feed(tag):
+@app.route("/hashtag/<tag>", methods=["GET", "POST"])
+def hashtag_feed(tag):  
     if "username" not in session:
         flash("Please sign in to access TwINSA.", "error")
         return redirect(url_for("login"))
@@ -1166,6 +1166,56 @@ def hashtag_feed(tag):
     posts = load_posts()
     username = session["username"]
     current_user = db.get_user(username)
+
+     # 🔹 Nouveau : gérer la création de post même sur une page hashtag
+    if request.method == "POST":
+        content = request.form.get("tweet", "").strip()
+        image_file = request.files.get("image")
+
+        # Même validation que dans /feed
+        if not content and (not image_file or image_file.filename == ""):
+            flash("You must provide text or an image!", "error")
+            return redirect(url_for("hashtag_feed", tag=tag))
+
+        hashtags = Post.extract_hashtags(content)
+        is_valid, error_msg = Post.validate_hashtags(hashtags)
+        if not is_valid:
+            flash(error_msg or "Hashtags must have max 10 characters and contain only letters or numbers.", "error")
+            return redirect(url_for("hashtag_feed", tag=tag))
+
+        image_filename = None
+        if image_file and image_file.filename != "":
+            uploads_dir = os.path.join("static", "uploads")
+            os.makedirs(uploads_dir, exist_ok=True)
+            image_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image_file.filename)}"
+            image_file.save(os.path.join(uploads_dir, image_filename))
+
+        # Création du post (même logique que /feed)
+        new_post = Post(content, username, db, image_filename)
+        poster_user = db.get_user(new_post.poster_username)
+
+        post_data = {
+            "poster_username": new_post.poster_username,
+            "poster_pfp": poster_user.profile_picture if poster_user else "default.png",
+            "content": new_post.content,
+            "image": image_filename,
+            "date": new_post.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "likes": new_post.likes,
+            "comments": [],
+            "hashtags": new_post.hashtags,
+            "post_id": new_post.post_id,
+        }
+
+        # On ajoute en tête comme dans /feed
+        posts.insert(0, post_data)
+        current_user.add_post(new_post)
+        db.save_users()
+        save_posts(posts)
+        flash("Post created successfully!", "success")
+
+        # 🔁 On reste sur la page filtrée
+        return redirect(url_for("hashtag_feed", tag=tag))
+
     # Donner l'index global à chaque post
     for idx, p in enumerate(posts):
         p["index"] = idx
