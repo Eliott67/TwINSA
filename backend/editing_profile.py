@@ -1,6 +1,7 @@
 import os
 from backend.users_db import UsersDatabase
 from backend.user import User
+import bcrypt
 
 users_db = UsersDatabase("backend/users_database.json")
 
@@ -31,7 +32,8 @@ def update_profile_picture(user: User, picture_path):
 
 def delete_account(user: User, password):
     """Supprime le compte si le mot de passe est correct."""
-    if user.get_password() == password:
+    stored_hash = user.password.encode()  # hash stocké dans l'objet user
+    if bcrypt.checkpw(password.encode(), stored_hash):
         users_db.remove_user(user.username)
         users_db.save_users()
         return True

@@ -1,5 +1,5 @@
 # login_logout.py
-
+import bcrypt
 import users_db  # ce module sera remplacé par FakeUsersDB pendant les tests
 
 def login(identifier=None, password=None):
@@ -22,8 +22,10 @@ def login(identifier=None, password=None):
         print("User not found. Please check your username/email.")
         return None
 
-    # Vérifie le mot de passe
-    if user["password"] != password:
+    # Vérifie le mot de passe hashé
+    stored_hash = user["password_hash"].encode()
+
+    if not bcrypt.checkpw(password.encode(), stored_hash):
         print("Wrong password.")
         return None
 

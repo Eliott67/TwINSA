@@ -2,7 +2,7 @@
     "ines": {
         "username": "ines",
         "email": "ines@mail.com",
-        "password": "pass123",
+        "password": "$2b$12$l8Wraha01YRNeKplfzh0XuCzQ1s.C.OWzI9bQaXgP4gNTXyTIj4iy",
         "name": "In\u00e9s",
         "age": 20,
         "country": "Andorra",
@@ -10,21 +10,10 @@
         "followers": [],
         "following": []
     },
-    "alex": {
-        "username": "alex",
-        "email": "alex@mail.com",
-        "password": "pass321",
-        "name": "Alex",
-        "age": 19,
-        "country": "Miami",
-        "is_public": true,
-        "followers": [],
-        "following": []
-    },
     "maria": {
         "username": "maria",
         "email": "maria@hotmail.com",
-        "password": "pass231",
+        "password": "$2b$12$S0B8bHBGK0MR9E.qEmrdfetGPZ0M10x6LARBxk8EFgm75odQxkAQO",
         "name": "Mar\u00eda",
         "age": 21,
         "country": "Spain",

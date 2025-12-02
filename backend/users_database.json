@@ -1,8 +1,8 @@
 {
     "alice": {
         "username": "alice",
-        "email": "alice@mail.com",
-        "password": "1234",
+        "email": "20201.plissontrehet.thomas@gmail.com",
+        "password": "$2b$12$fi29Am2SrpH7sGrIUIeZHuKsrNfM0yTKCjex0jz4xAHFThd9X48lq",
         "name": "Alice",
         "profile_picture": null,
         "age": 25,
@@ -17,7 +17,7 @@
     "bob": {
         "username": "bob",
         "email": "bob@mail.com",
-        "password": "5678",
+        "password": "$2b$12$Xtvz0TAZb1djofBmUtgNXehQnuxqgqxZ9y6gCUsfr5NgNs8znq7MK",
         "name": "Bob",
         "profile_picture": null,
         "age": 28,
@@ -34,7 +34,7 @@
     "charlie": {
         "username": "charlie",
         "email": "charlie@email.com",
-        "password": "Pass789!",
+        "password": "$2b$12$hT8JLZfqEqAg.o83DggdpefcWHmIbkYMYedeJHn6mWfHSmhU44ZdW",
         "name": "Charlie",
         "profile_picture": null,
         "age": 28,
@@ -53,7 +53,7 @@
     "Meri": {
         "username": "Meri",
         "email": "meri@gmail.com",
-        "password": "Coucou123!",
+        "password": "$2b$12$kBCEw9Aq/4oZPpOiRvUxj.FEA086M7cDeAA6cSdjh/kHZTdPBv3cG",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -68,7 +68,7 @@
     "In\u00e9s": {
         "username": "In\u00e9s",
         "email": "ines@gmail.com",
-        "password": "Coucou123!",
+        "password": "$2b$12$fRX49O.WASDjB2pZh8e.J.uUS.XBYAHw0DFBpPVUJCh.K.J7aDYEy",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -83,7 +83,7 @@
     "Eliott": {
         "username": "Eliott",
         "email": "oster@mail.fr",
-        "password": "Eliott123456789!",
+        "password": "$2b$12$eU..0p5P/FyNmegUcdwjMezSJMYPnygOCUBz5aaivBDLoxn.Uz7Z2",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -107,7 +107,7 @@
     "lol": {
         "username": "lol",
         "email": "lol@gmail.com",
-        "password": "LOL@mee1",
+        "password": "$2b$12$BwLIp2VWG4TKD9VW1wQvAOYBrFFKMO1DRrQsmDzYQT/fr0cR.oPXm",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -122,7 +122,7 @@
     "alex": {
         "username": "alex",
         "email": "alex@gmail.com",
-        "password": "pass2Alex!",
+        "password": "$2b$12$dsB2g7nvO3YXGaImm7SHM.XqLSFin.XrgFPxvkT0EdXhzzbnzMOT6",
         "name": "Alex",
         "profile_picture": null,
         "age": 20,
@@ -145,7 +145,7 @@
     "sara": {
         "username": "sara",
         "email": "sara@gmail.com",
-        "password": "pass2Sara!",
+        "password": "$2b$12$tAVSbzdOHlhr1rR2WzVSpOh9cvoINx1QBYx8QTEuXPvT0XfoGY4/W",
         "name": "Sara",
         "profile_picture": null,
         "age": 22,
@@ -160,7 +160,7 @@
     "leo_le_bg": {
         "username": "leo_le_bg",
         "email": "zozo@gmail.com",
-        "password": "Zozo@me1",
+        "password": "$2b$12$wYQyba4cgwdcRWlmcgND7.Y2B8IB65FsD6cBuj95C0CEYOyLUmjfm",
         "name": "",
         "profile_picture": "leo_le_bg_pfp.jpg",
         "age": 22,
@@ -190,7 +190,7 @@
     "toto": {
         "username": "toto",
         "email": "toto@gmail.com",
-        "password": "Toto@123",
+        "password": "$2b$12$B1Ks68/l3yaZnEuDhqPsoemlCHgwrEv83cqr8flOqwaNsngJAHzHy",
         "name": "toto_le_zozo",
         "profile_picture": "toto_pfp.jpg",
         "age": 69,
@@ -219,7 +219,7 @@
     "noa_le_caca": {
         "username": "noa_le_caca",
         "email": "noa@gmail.com",
-        "password": "Caca@123",
+        "password": "$2b$12$ilb.084oaLsj13yQyRQLJO.oQdUxbJBVixhb9lYkH5WcIk9593T4G",
         "name": "",
         "profile_picture": "noa_le_caca_pfp.png",
         "age": 0,
@@ -240,7 +240,7 @@
     "eliott_le_dragon": {
         "username": "eliott_le_dragon",
         "email": "eliott@gmail.com",
-        "password": "Eliott@123",
+        "password": "$2b$12$0APLBQ3/u/We8EEfbLP8VOV7ZQY7G9A4kUoaIL9lMrVdqdmYeKOMS",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -265,7 +265,7 @@
     "leo_bis": {
         "username": "leo_bis",
         "email": "bis@gmail.com",
-        "password": "Bis@1234",
+        "password": "$2b$12$bzZRoQ2MAt2qt9sK9hkcsuFAj7tq9RT8OVSMt86r6Q6kiJlSe0oD6",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -282,7 +282,7 @@
     "test_final": {
         "username": "test_final",
         "email": "ui@gmail.com",
-        "password": "Test@123",
+        "password": "$2b$12$6q00QJkFGl/XFAYVx/53r.iofDI/vQ.jPYVhtWlgOGbnv5E7fWqry",
         "name": "",
         "profile_picture": null,
         "age": 0,
@@ -297,7 +297,7 @@
     "test": {
         "username": "test",
         "email": "test@gmail.com",
-        "password": "Test12345!",
+        "password": "$2b$12$QUUcLDdYeDP8FdlWZDG0auxgkljqVuuMEqer4Zg7Y//CBpPtI9poK",
         "name": "",
         "profile_picture": null,
         "age": 0,

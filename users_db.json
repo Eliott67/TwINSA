@@ -1,35 +1,28 @@
 {
-    "Eliott": {
-        "email": "eliottost@gmail.com",
-        "password": "twinsa123!",
-        "name": "",
-        "age": null,
-        "country": ""
-    },
     "Leo ": {
         "email": "parnotte@insa-toulouse.fr",
-        "password": "lep_la_trique",
+        "password": "$2b$12$2Qo/7S58EUGMAgGdwuRkz.mbtW62GNuPGvAYc4lAqyiXNorrZg7ra",
         "name": "",
         "age": null,
         "country": ""
     },
     "Salut": {
         "email": "ioheotahtoz@gmail.com",
-        "password": "trois",
+        "password": "$2b$12$BugHltx5CcgaK8ILAKsc4eZA.oQlbt9/voe7EZ/rAUA2CegJOQCy6",
         "name": "",
         "age": null,
         "country": ""
     },
     "zzz": {
         "email": "zzz@gmail.com",
-        "password": "zzz",
+        "password": "$2b$12$cGKp4CyYXqww1kcaPq/QZO1cm3mUOIHX8xa0JS3s/JWVjKeTmHlQe",
         "name": "",
         "age": null,
         "country": ""
     },
     "bb bb": {
         "email": "bb@gmail.com",
-        "password": "bb",
+        "password": "$2b$12$X3hg9HIDHPygsTZWFbE9UegYM3Sh6IO0NEK0pWJbb4PspsjP56SQ6",
         "name": "",
         "age": null,
         "country": ""

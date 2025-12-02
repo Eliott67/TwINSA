@@ -3,7 +3,7 @@
 import json
 import os
 from backend.user import *  # module user.py qui contient la classe User
-
+from backend.change_password import SecureUser
 
 class UsersDatabase:
     def __init__(self, db_file='users_database.json'):
@@ -48,7 +48,7 @@ class UsersDatabase:
                 notifications = data.get('notifications', [])
 
                 # on recrée l'objet User
-                user_new = User(username_item, email, password, name, age, country, is_public, profile_picture=image)
+                user_new = SecureUser(username_item, email, password, name, age, country, is_public, profile_picture=image, hashed=True)
 
                 # on réinjecte les listes (listes de usernames)
                 user_new.followers = followers
@@ -100,7 +100,7 @@ class UsersDatabase:
     def authenticate_user(self, username, password):
         if username in self.usernames_list:
             user_obj = self.get_user(username)
-            if user_obj and user_obj.get_password() == password:
+            if user_obj and user_obj.check_password(password):
                 return True
         return False
     

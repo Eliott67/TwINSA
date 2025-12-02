@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-import registration
-import users_db
-=======
 from registration import validate_registration, users_db
 from user import User
 
->>>>>>> be79723 (Application à jour avec logos et registration qui fonctionne)
 
 # Success 
 print("Test 1 - Success :")

@@ -8,6 +8,7 @@ from backend.posting import *
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 from urllib.parse import urlencode
+from bcrypt import checkpw
 
 UPLOAD_FOLDER = "static/profile_pics"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -189,7 +190,10 @@ def forgot_password():
             password=user_found.get_password(),
             name=user_found.name,
             age=user_found.age,
-            country=user_found.country
+            country=user_found.country,
+            is_public=user_found.is_public,
+            profile_picture=user_found.profile_picture,
+            hashed=True
         )
         su.generate_reset_token()
         print(f"[DEBUG] Reset token for {email}: {su.reset_token}")
@@ -739,7 +743,7 @@ def delete_account_route():
     password = request.form.get("password")
 
     user = db.get_user(username)
-    if user and user.get_password() == password:
+    if user and checkpw(password.encode(), user.get_password().encode()):
         db.remove_user(username)
         session.pop("username", None)
         flash("Account deleted successfully.", "success")
@@ -1033,8 +1037,8 @@ def change_password():
         new_password = request.form.get("new_password")
         confirm = request.form.get("confirm_password")
 
-        # Vérification ancien mdp
-        if user.get_password() != old_password:
+        # Vérification ancien mdp (bcrypt)
+        if not user.check_password(old_password):
             flash("Incorrect current password.", "error")
             return redirect(url_for("change_password"))
 
@@ -1044,7 +1048,7 @@ def change_password():
             return redirect(url_for("change_password"))
 
         # Update
-        user.password = new_password
+        user.change_password(old_password, new_password)
         db.save_users()
         flash("Password updated successfully!", "success")
         # ⚠️ Cette route redirige sans username, tu pourras l'ajuster plus tard si besoin

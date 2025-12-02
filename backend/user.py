@@ -1,10 +1,14 @@
 from .notification import *
+import bcrypt
 
 class User:
-    def __init__(self, username, email, password, name, age, country, is_public=True, profile_picture = None):
+    def __init__(self, username, email, password, name, age, country, is_public=True, profile_picture = None, hashed=False):
         self.username = username
         self.email = email
-        self.__password = password # Private attribute
+        if hashed:
+            self.__password = password   # déjà hashé → pas de hash
+        else:
+            self.__password = self.hash_password(password)
         self.name = name
         self.profile_picture = profile_picture
         self.age = age
@@ -190,7 +194,7 @@ class User:
             users_dict = {
                 'username': self.username,
                 'email': self.email,
-                'password': self.get_password(),
+                "password": self.__password,
                 "name": self.name,
                 "profile_picture" : self.profile_picture,
                 "age": self.age,
@@ -214,12 +218,22 @@ class User:
                 age=data.get("age"),
                 country=data.get("country", ""),
                 is_public=data.get("is_public", True),
-                profile_picture=data.get("profile_picture"))  # ← ON RECHARGE LA PHOTO
-            
+                profile_picture=data.get("profile_picture"),  # ← ON RECHARGE LA PHOTO
+                hashed=True)  # Le mot de passe est déjà hashé
 
             user.followers = data.get("followers", [])
             user.following = data.get("following", [])
             user.blocked_users = data.get("blocked", [])
+            user.pending_requests = data.get("pending_requests", [])
+            user.notifications = data.get("notifications", [])
             return user
 
+    
+    def hash_password(self, password: str) -> str:
+        """Returns a bcrypt hash of the password."""
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+    def check_password(self, password: str) -> bool:
+        """Checks whether a plaintext password matches the stored hash."""
+        return bcrypt.checkpw(password.encode(), self.__password.encode())
     

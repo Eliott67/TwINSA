@@ -2,7 +2,7 @@
     "ines": {
         "username": "ines",
         "email": "ines@mail.com",
-        "password": "pass123",
+        "password": "$2b$12$uUD.xMYku3VDFOrannGsluBZJoyHoFtweykO1OdYYvEIADfj5J4BG",
         "name": "In\u00e9s",
         "age": 20,
         "country": "Andorra"

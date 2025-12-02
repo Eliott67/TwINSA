@@ -24,10 +24,6 @@ def validate_registration(user : User, confirm_password : str):
     if not user.username or not user.email or not user.get_password() or not confirm_password:
         return False, "All fields are required."
     
-    # Password match 
-    if user.get_password() != confirm_password:
-        return False, "Passwords do not match."
-    
     # Password strength check
     if not is_strong_password(user.get_password()):
         return False, "Password must be at least " + str(MIN_PASSWORD_LENGTH) + " characters long and include uppercase, lowercase, digit, and special character."
@@ -66,6 +62,9 @@ def registration():
     else:
         age = int(age)
     country = input("Enter your country: ") or "Unknown"
+    if password != confirm_password:
+        print("Passwords do not match.")
+        return
 
     # If all checks pass, register the user
     new_user = User(username, email, password, name, age, country)
@@ -78,5 +77,3 @@ def registration():
 
 if __name__ == "__main__":
     registration()
-
-    
